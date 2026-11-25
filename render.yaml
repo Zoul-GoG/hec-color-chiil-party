@@ -8,12 +8,21 @@ services:
     # Free plan: sleeps after 15 min without traffic (~1 min cold start) and has no shell.
     # Keep it awake on party night with an external ping on /api/health (see README).
     plan: free
-    buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm build
-    startCommand: pnpm start
+    # /usr/bin is read-only on Render: install the pnpm shim (pinned by package.json "packageManager")
+    # in a writable folder instead of the default `corepack enable`.
+    buildCommand: >-
+      mkdir -p "$HOME/.local/bin" &&
+      corepack enable --install-directory "$HOME/.local/bin" &&
+      export PATH="$HOME/.local/bin:$PATH" &&
+      pnpm install --frozen-lockfile --prod=false &&
+      pnpm build
+    startCommand: node apps/api/dist/main.js
     healthCheckPath: /api/health
     envVars:
       - key: NODE_ENV
         value: production
+      - key: NODE_VERSION # corepack ships with Node 22 (removed in Node 25)
+        value: '22'
       - key: MONGOMS_DISABLE_POSTINSTALL
         value: '1'
       - key: MONGODB_URI
