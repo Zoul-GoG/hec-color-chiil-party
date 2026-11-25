@@ -24,6 +24,8 @@ Tous les types ci-dessous sont à définir dans `packages/shared` et utilisés p
 | `SUBMISSIONS_CLOSED` | 403 | « Les propositions sont closes, place à la fête ! » |
 | `RATE_LIMITED` | 429 | « Doucement DJ 😅 Réessaie dans un instant. » |
 | `DEEZER_UNAVAILABLE` | 503 | « La recherche est momentanément indisponible. » |
+| `EMAIL_TAKEN` | 409 | « Un compte existe déjà avec cet email. » |
+| `SUPER_ADMIN_PROTECTED` | 403 | « Action réservée au super admin. » |
 | `INTERNAL_ERROR` | 500 | « Oups, une erreur est survenue. » |
 
 ## 2. Types partagés
@@ -159,6 +161,15 @@ Corps : `{ "played"?: boolean, "hidden"?: boolean }` → `200 AdminTrackDto`. `p
 Mêmes filtres que la liste, sans pagination, **morceaux masqués exclus**.
 `application/vnd.openxmlformats-officedocument.spreadsheetml.sheet`, feuille « Classement », en-tête figé + filtres automatiques. Colonnes :
 `Rang | Titre | Artiste | Album | Genre | Ajouts | Premier ajout | Dernier ajout | Joué | Lien Deezer` (dates Excel natives, lien cliquable).
+
+### Gestion des utilisateurs (tous les comptes sont admins)
+`login` et `me` renvoient `{ id, email, isSuperAdmin }`. Le **super admin** est le compte dont l'email = `ADMIN_EMAIL`.
+- `GET /api/admin/users` → `200 AdminUserDto[]` (`{ id, email, isSuperAdmin, isMe, createdAt, lastLoginAt }`, super admin en tête).
+- `POST /api/admin/users` `{ email, password }` (mot de passe ≥ 8) → `201 AdminUserDto` ; `409 EMAIL_TAKEN`.
+- `PATCH /api/admin/users/:id` `{ email?, password? }` → `200 AdminUserDto`. Un changement de mot de passe déconnecte les sessions du compte ;
+  si c'est le sien, un nouveau cookie est émis (la session courante reste ouverte).
+- `DELETE /api/admin/users/:id` → `204` (supprimer son propre compte efface aussi le cookie).
+- Super admin : email non modifiable, mot de passe modifiable **par lui seul**, **non supprimable** → `403 SUPER_ADMIN_PROTECTED`. Id inconnu → `404 NOT_FOUND`.
 
 ### `PATCH /api/admin/settings` (P1)
 Corps `{ "submissionsOpen": boolean }` → `200 { "submissionsOpen": boolean }`.

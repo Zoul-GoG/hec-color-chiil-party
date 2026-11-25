@@ -56,5 +56,31 @@ export interface AdminLoginDto {
 }
 
 export interface AdminMeDto {
+  id: string;
   email: string;
+  /** The account whose email is ADMIN_EMAIL (server config). */
+  isSuperAdmin: boolean;
+}
+
+/** Minimum length of an admin password (API validation + form hint). */
+export const ADMIN_PASSWORD_MIN = 8;
+
+/** User management (GET/POST/PATCH/DELETE /api/admin/users). Every account is a full admin. */
+export interface AdminUserDto {
+  id: string;
+  email: string;
+  isSuperAdmin: boolean;
+  isMe: boolean;
+  createdAt: string;
+  lastLoginAt: string | null;
+}
+
+export interface CreateAdminUserDto {
+  email: string;
+  password: string;
+}
+
+export interface UpdateAdminUserDto {
+  email?: string;
+  password?: string;
 }

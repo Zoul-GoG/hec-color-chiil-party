@@ -9,7 +9,7 @@ import { LoginBodyDto } from './auth.dto';
 import { AuthService } from './auth.service';
 import { JwtCookieGuard, type AdminRequest } from './jwt-cookie.guard';
 
-function cookieOptions(req: Request, maxAgeMs?: number): CookieOptions {
+export function cookieOptions(req: Request, maxAgeMs?: number): CookieOptions {
   return {
     httpOnly: true,
     sameSite: 'lax',
@@ -34,9 +34,14 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ): Promise<AdminMeDto> {
     const ipKey = hashIp(req.ip, this.config.get('JWT_SECRET', { infer: true }));
-    const { email, token, maxAgeMs } = await this.auth.login(body.email, body.password, body.remember, ipKey);
+    const { session, token, maxAgeMs } = await this.auth.login(
+      body.email,
+      body.password,
+      body.remember,
+      ipKey,
+    );
     res.cookie(AUTH.cookieName, token, cookieOptions(req, maxAgeMs));
-    return { email };
+    return { id: session.id, email: session.email, isSuperAdmin: session.isSuperAdmin };
   }
 
   @Post('logout')
@@ -48,6 +53,7 @@ export class AuthController {
   @Get('me')
   @UseGuards(JwtCookieGuard)
   me(@Req() req: AdminRequest): AdminMeDto {
-    return { email: req.admin!.email };
+    const { id, email, isSuperAdmin } = req.admin!;
+    return { id, email, isSuperAdmin };
   }
 }

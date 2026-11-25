@@ -60,7 +60,9 @@ describe('Admin auth (front)', () => {
 
   it('logs in with remember me and lands on the dashboard', async () => {
     vi.spyOn(adminApi, 'me').mockRejectedValue(unauthorized());
-    const login = vi.spyOn(adminApi, 'login').mockResolvedValue({ email: 'bde@hec.ci' });
+    const login = vi
+      .spyOn(adminApi, 'login')
+      .mockResolvedValue({ id: 'a1', email: 'bde@hec.ci', isSuperAdmin: true });
     renderApp(<AppRoutes />, ['/admin/login']);
     await screen.findByRole('heading', { name: 'Connexion' });
     fill('bde@hec.ci', 'secret');
@@ -73,7 +75,9 @@ describe('Admin auth (front)', () => {
   });
 
   it('already logged in: /admin/login redirects to /admin; logout goes back to login', async () => {
-    const me = vi.spyOn(adminApi, 'me').mockResolvedValue({ email: 'bde@hec.ci' });
+    const me = vi
+      .spyOn(adminApi, 'me')
+      .mockResolvedValue({ id: 'a1', email: 'bde@hec.ci', isSuperAdmin: true });
     vi.spyOn(adminApi, 'logout').mockResolvedValue(undefined);
     renderApp(<AppRoutes />, ['/admin/login']);
     expect(await screen.findByRole('heading', { name: 'Tableau de bord' })).toBeInTheDocument();

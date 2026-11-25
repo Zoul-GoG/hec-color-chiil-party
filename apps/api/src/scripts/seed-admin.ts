@@ -2,11 +2,14 @@ import { NestFactory } from '@nestjs/core';
 import { AdminSeedService } from '../admin/auth/admin-seed.service';
 import { AppModule } from '../app.module';
 
-/** `pnpm --filter api seed:admin` — creates/updates the admin from ADMIN_EMAIL / ADMIN_PASSWORD. */
+/**
+ * `pnpm --filter api seed:admin` — recovery tool: (re)creates the super admin (ADMIN_EMAIL) and
+ * FORCES its password back to ADMIN_PASSWORD (logs out its sessions). Other accounts are untouched.
+ */
 async function main(): Promise<void> {
-  // The app bootstrap already runs the seed (onApplicationBootstrap).
   const app = await NestFactory.createApplicationContext(AppModule, { logger: ['log', 'warn', 'error'] });
-  await app.get(AdminSeedService).seed();
+  // The bootstrap seed only applies ADMIN_PASSWORD when it changed; the script forces it.
+  await app.get(AdminSeedService).seed({ force: true });
   await app.close();
   // Exit explicitly: a local in-memory MongoDB child would otherwise keep the process alive.
   process.exit(0);

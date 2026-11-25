@@ -9,6 +9,8 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtCookieGuard } from './jwt-cookie.guard';
 import { LoginAttemptsService } from './login-attempts.service';
+import { UsersController } from '../users/users.controller';
+import { UsersService } from '../users/users.service';
 
 @Module({
   imports: [
@@ -20,8 +22,8 @@ import { LoginAttemptsService } from './login-attempts.service';
       }),
     }),
   ],
-  controllers: [AuthController],
-  providers: [AuthService, AdminSeedService, LoginAttemptsService, JwtCookieGuard],
+  controllers: [AuthController, UsersController],
+  providers: [AuthService, AdminSeedService, LoginAttemptsService, JwtCookieGuard, UsersService],
   exports: [AuthService, JwtCookieGuard, AdminSeedService],
 })
 export class AuthModule {}

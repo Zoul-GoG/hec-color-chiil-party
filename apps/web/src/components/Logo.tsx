@@ -7,10 +7,13 @@ export function Logo({
   suffix,
   to = '/',
   onDark = false,
+  compact = false,
 }: {
   suffix?: string;
   to?: string;
   onDark?: boolean;
+  /** Hide the text below 640 px (crowded admin header): logos only. */
+  compact?: boolean;
 }) {
   return (
     <Link to={to} className="flex min-w-0 items-center gap-3 rounded-md">
@@ -32,10 +35,14 @@ export function Logo({
           height={32}
         />
       </span>
-      <span aria-hidden className={cn('h-6 w-px shrink-0', onDark ? 'bg-white/40' : 'bg-border')} />
+      <span
+        aria-hidden
+        className={cn('h-6 w-px shrink-0', onDark ? 'bg-white/40' : 'bg-border', compact && 'max-sm:hidden')}
+      />
       <span
         className={cn(
           'truncate font-display text-base font-bold whitespace-nowrap',
+          compact && 'max-sm:sr-only',
           onDark ? 'text-white' : 'text-fg',
         )}
       >

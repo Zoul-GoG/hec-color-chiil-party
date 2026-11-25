@@ -38,3 +38,7 @@ pnpm lint && pnpm typecheck && pnpm test
   gratuit (ex. UptimeRobot, monitor HTTP toutes les 5 min sur `https://<url>/api/health`) — ou passe en *starter* pour la soirée ;
 - **pas de shell Render** : les scripts de maintenance se lancent depuis ton poste, pointés sur la base Atlas :
   `MONGODB_URI='mongodb+srv://…' pnpm --filter api reset-data -- --yes` (idem `recount`, `seed:admin`).
+
+**Comptes admin** : page « Utilisateurs » du dashboard (`/admin/users`). Le super admin = `ADMIN_EMAIL`.
+Mot de passe du super admin oublié → `MONGODB_URI='…' ADMIN_EMAIL='…' ADMIN_PASSWORD='…' JWT_SECRET='…' pnpm --filter api seed:admin`
+(le remet à `ADMIN_PASSWORD`). Changer `ADMIN_PASSWORD` sur Render le réapplique aussi au redémarrage suivant.

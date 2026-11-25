@@ -2,6 +2,9 @@ import {
   ErrorCode,
   type AdminLoginDto,
   type AdminMeDto,
+  type AdminUserDto,
+  type CreateAdminUserDto,
+  type UpdateAdminUserDto,
   type AdminTrackDto,
   type AdminTrackPatchDto,
   type AdminTracksQuery,
@@ -80,6 +83,15 @@ export const adminApi = {
       method: 'PATCH',
       body: JSON.stringify(body),
     }),
+  users: () => request<AdminUserDto[]>('/admin/users'),
+  createUser: (body: CreateAdminUserDto) =>
+    request<AdminUserDto>('/admin/users', { method: 'POST', body: JSON.stringify(body) }),
+  updateUser: (id: string, body: UpdateAdminUserDto) =>
+    request<AdminUserDto>(`/admin/users/${encodeURIComponent(id)}`, {
+      method: 'PATCH',
+      body: JSON.stringify(body),
+    }),
+  deleteUser: (id: string) => request<void>(`/admin/users/${encodeURIComponent(id)}`, { method: 'DELETE' }),
 };
 
 export const api = {

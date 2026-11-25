@@ -45,7 +45,7 @@ const list = (items: AdminTrackDto[]): AdminTracksResponseDto => ({
 
 beforeEach(() => {
   vi.spyOn(api, 'settings').mockResolvedValue({ submissionsOpen: true, eventName: 'x', eventDate: 'x' });
-  vi.spyOn(adminApi, 'me').mockResolvedValue({ email: 'bde@hec.ci' });
+  vi.spyOn(adminApi, 'me').mockResolvedValue({ id: 'a1', email: 'bde@hec.ci', isSuperAdmin: true });
   vi.spyOn(adminApi, 'stats').mockResolvedValue(stats);
 });
 afterEach(() => vi.restoreAllMocks());

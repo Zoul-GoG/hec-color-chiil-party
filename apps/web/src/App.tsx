@@ -11,6 +11,7 @@ const LoginPage = lazy(() => import('./features/admin/LoginPage').then((m) => ({
 const DashboardPage = lazy(() =>
   import('./features/admin/DashboardPage').then((m) => ({ default: m.DashboardPage })),
 );
+const UsersPage = lazy(() => import('./features/admin/UsersPage').then((m) => ({ default: m.UsersPage })));
 
 const fallback = (
   <div className="flex min-h-dvh items-center justify-center text-fg-muted" role="status">
@@ -36,6 +37,16 @@ export function AppRoutes() {
           <RequireAdmin>
             <Suspense fallback={fallback}>
               <DashboardPage />
+            </Suspense>
+          </RequireAdmin>
+        }
+      />
+      <Route
+        path="/admin/users"
+        element={
+          <RequireAdmin>
+            <Suspense fallback={fallback}>
+              <UsersPage />
             </Suspense>
           </RequireAdmin>
         }

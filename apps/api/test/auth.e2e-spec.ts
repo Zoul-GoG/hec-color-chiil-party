@@ -38,7 +38,7 @@ describe('Admin auth (e2e)', () => {
 
   it('good credentials -> httpOnly cookie (12 h) and /me 200', async () => {
     const res = await login({ email: ' Admin@Test.local ', password: PASSWORD }, '10.0.0.2').expect(200);
-    expect(res.body).toEqual({ email: EMAIL });
+    expect(res.body).toEqual({ id: expect.any(String), email: EMAIL, isSuperAdmin: true });
     const cookie = cookieOf(res);
     expect(cookie).toMatch(/HttpOnly/i);
     expect(cookie).toMatch(/SameSite=Lax/i);
@@ -48,7 +48,7 @@ describe('Admin auth (e2e)', () => {
       .get('/api/admin/auth/me')
       .set('Cookie', cookie.split(';')[0])
       .expect(200);
-    expect(me.body).toEqual({ email: EMAIL });
+    expect(me.body).toEqual({ id: res.body.id, email: EMAIL, isSuperAdmin: true });
   });
 
   it('remember me -> 7 day cookie', async () => {

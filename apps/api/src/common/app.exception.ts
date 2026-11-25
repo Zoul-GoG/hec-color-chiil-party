@@ -13,6 +13,9 @@ export const ERROR_MESSAGES: Record<ErrorCode, string> = {
   SUBMISSIONS_CLOSED: 'Les propositions sont closes, place à la fête !',
   RATE_LIMITED: 'Doucement DJ 😅 Réessaie dans un instant.',
   DEEZER_UNAVAILABLE: 'La recherche est momentanément indisponible.',
+  EMAIL_TAKEN: 'Un compte existe déjà avec cet email.',
+  SUPER_ADMIN_PROTECTED:
+    'Seul le super admin peut modifier son mot de passe ; son compte ne peut pas être supprimé.',
   INTERNAL_ERROR: 'Oups, une erreur est survenue.',
 };
 
@@ -27,6 +30,8 @@ const STATUS: Record<ErrorCode, number> = {
   SUBMISSIONS_CLOSED: 403,
   RATE_LIMITED: 429,
   DEEZER_UNAVAILABLE: 503,
+  EMAIL_TAKEN: 409,
+  SUPER_ADMIN_PROTECTED: 403,
   INTERNAL_ERROR: 500,
 };
 

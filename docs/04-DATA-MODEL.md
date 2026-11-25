@@ -57,7 +57,8 @@ AdditionSchema.index({ guestId: 1 });
 
 ## 3. `admins`
 `email` (unique, minuscules), `passwordHash` (bcryptjs, coût 12), `lastLoginAt`.
-Seed au démarrage depuis `ADMIN_EMAIL` / `ADMIN_PASSWORD` (upsert ; le hash n'est réécrit que si le mot de passe a changé).
+Plusieurs comptes (tous admins), champs `sessionVersion` (révocation des sessions, incluse dans le JWT) et `envPasswordHash` (super admin).
+Seed au démarrage : crée le super admin (`ADMIN_EMAIL`) s'il manque ; ne réapplique `ADMIN_PASSWORD` que si cette variable a changé (un mot de passe modifié dans l'interface survit aux redémarrages) ; ne touche jamais aux autres comptes. `pnpm --filter api seed:admin` **force** la réinitialisation (récupération).
 
 ## 4. `settings` (P1) — document unique `_id: "global"` : `{ submissionsOpen: true }`
 

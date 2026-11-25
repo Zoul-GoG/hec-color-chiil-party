@@ -3,9 +3,9 @@ import { ErrorCode } from '@hcc/shared';
 import type { Request } from 'express';
 import { AppException } from '../../common/app.exception';
 import { AUTH } from '../../config/constants';
-import { AuthService, type AdminJwtPayload } from './auth.service';
+import { AuthService, type AdminSession } from './auth.service';
 
-export type AdminRequest = Request & { admin?: AdminJwtPayload };
+export type AdminRequest = Request & { admin?: AdminSession };
 
 /** Protects /api/admin/* (except login/logout) with the httpOnly `hcc_admin` cookie. */
 @Injectable()
