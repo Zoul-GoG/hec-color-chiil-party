@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { fr } from '../i18n/fr';
 import { cn } from './ui/cn';
 
-/** HEC Abidjan logo + separator + "Color & Chill" (docs/06 §7). */
+/** HEC Abidjan logo (first, main) + BDE logo + separator + "Color & Chill" (docs/06 §7). */
 export function Logo({
   suffix,
   to = '/',
@@ -14,12 +14,21 @@ export function Logo({
 }) {
   return (
     <Link to={to} className="flex min-w-0 items-center gap-3 rounded-md">
-      <span className={cn('inline-flex shrink-0', onDark && 'rounded-md bg-white px-1.5 py-1')}>
+      <span
+        className={cn('inline-flex shrink-0 items-center gap-2', onDark && 'rounded-md bg-white px-1.5 py-1')}
+      >
         <img
           src="/hec-abidjan-logo.png"
           alt={fr.brand.logoAlt}
           className="h-8 w-auto"
-          width={96}
+          width={49}
+          height={32}
+        />
+        <img
+          src="/bde-hec-abidjan-logo.png"
+          alt={fr.brand.bdeLogoAlt}
+          className="h-8 w-auto"
+          width={28}
           height={32}
         />
       </span>
@@ -32,7 +41,7 @@ export function Logo({
       >
         {fr.brand.name}
         {suffix ? (
-          <span className={cn('font-semibold', onDark ? 'text-white/80' : 'text-fg-muted')}> · {suffix}</span>
+          <span className={cn('font-semibold max-sm:hidden', onDark ? 'text-white/80' : 'text-fg-muted')}> · {suffix}</span>
         ) : null}
       </span>
     </Link>

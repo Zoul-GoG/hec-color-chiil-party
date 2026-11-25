@@ -1,6 +1,7 @@
 import { act, fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { SEARCH_DEBOUNCE_MS } from '../../config';
+import { fr } from '../../i18n/fr';
 import { api } from '../../lib/api';
 import { added, page, result, track } from '../../test/factories';
 import { renderApp } from '../../test/render';
@@ -49,7 +50,7 @@ describe('Search debounce (US-1)', () => {
     type('ba');
     await flush(2000);
     expect(search).not.toHaveBeenCalled();
-    expect(screen.queryByText('RÉSULTATS DEEZER')).not.toBeInTheDocument();
+    expect(screen.queryByText(fr.search.resultsHeader)).not.toBeInTheDocument();
   });
 
   it('fires a single call after fast typing', async () => {
@@ -78,7 +79,7 @@ describe('Add from suggestions (US-3)', () => {
   const searchFor = async (q: string) => {
     type(q);
     fireEvent.keyDown(input(), { key: 'Enter' });
-    return screen.findByRole('region', { name: 'RÉSULTATS DEEZER' });
+    return screen.findByRole('region', { name: fr.search.resultsHeader });
   };
 
   it('clears the input, hides suggestions and shows a toast with title and artist', async () => {
@@ -92,7 +93,7 @@ describe('Add from suggestions (US-3)', () => {
     expect(addTrack).toHaveBeenCalledWith(745229932);
     expect(input()).toHaveValue('');
     expect(input()).toHaveFocus();
-    expect(screen.queryByRole('region', { name: 'RÉSULTATS DEEZER' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('region', { name: fr.search.resultsHeader })).not.toBeInTheDocument();
   });
 
   it('joined toast when others already added it', async () => {

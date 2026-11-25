@@ -13,6 +13,7 @@ export const fr = {
   brand: {
     name: 'Color & Chill',
     logoAlt: 'HEC Abidjan',
+    bdeLogoAlt: 'BDE HEC Abidjan',
   },
   theme: {
     toDark: 'Activer le mode sombre',
@@ -30,11 +31,13 @@ export const fr = {
   },
   search: {
     label: 'Rechercher un morceau',
-    placeholder: 'Un titre, un artiste… (ex. Didi B, Burna Boy, Magic System)',
+    placeholder: 'Un titre, un artiste… (ex. Didi B, Himra, Burna Boy, ...)',
     clear: 'Effacer la recherche',
     ideas: 'Idées :',
-    ideaChips: ['Coupé-Décalé', 'Afrobeats', 'Amapiano', 'Rap Ivoire', 'Zouglou', 'Afro House'],
-    resultsHeader: 'RÉSULTATS DEEZER',
+    ideaChips: ['Didi B', 'Suspect 95', 'Himra', 'Wantché', 'La B7', 'Dopelym'],
+    // ideaChips: ['Coupé-Décalé', 'Afrobeats', 'Amapiano', 'Rap Ivoire', 'Zouglou', 'Afro House'],
+    //resultsHeader: 'RÉSULTATS DEEZER',
+    resultsHeader: 'RÉSULTATS...',
     resultsCount: (n: number) => `${n} ${plural(n, 'résultat', 'résultats')}`,
     empty: (q: string) => `Aucun résultat pour « ${q} ». Essaie avec l'artiste ou une autre orthographe.`,
     retry: 'Réessayer',
