@@ -2,6 +2,12 @@ import {
   ErrorCode,
   type AdminLoginDto,
   type AdminMeDto,
+  type AdminTrackDto,
+  type AdminTrackPatchDto,
+  type AdminTracksQuery,
+  type AdminTracksResponseDto,
+  type Range,
+  type StatsDto,
   type AddTrackResponseDto,
   type Paginated,
   type PreviewDto,
@@ -61,6 +67,13 @@ export const adminApi = {
     request<AdminMeDto>('/admin/auth/login', { method: 'POST', body: JSON.stringify(body) }),
   logout: () => request<void>('/admin/auth/logout', { method: 'POST' }),
   me: () => request<AdminMeDto>('/admin/auth/me'),
+  stats: (range: Range) => request<StatsDto>(`/admin/stats${qs({ range })}`),
+  tracks: (q: AdminTracksQuery) => request<AdminTracksResponseDto>(`/admin/tracks${qs({ ...q })}`),
+  patchTrack: (trackKey: string, body: AdminTrackPatchDto) =>
+    request<AdminTrackDto>(`/admin/tracks/${encodeURIComponent(trackKey)}`, {
+      method: 'PATCH',
+      body: JSON.stringify(body),
+    }),
 };
 
 export const api = {

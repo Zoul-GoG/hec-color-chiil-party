@@ -50,10 +50,10 @@ Commit à la fin de chaque phase : `feat(phase-N): …`.
 - **Terminé quand** : impossible d'atteindre `/admin` sans être connecté ; ThemeToggle présent.
 
 ## Phase 4 — Dashboard admin (≈ 4 h)
-- [ ] `GET /api/admin/stats` (agrégations `04 §5`, tranches vides complétées).
-- [ ] `GET /api/admin/tracks` (filtres, tris, rang global, liste des genres) + `PATCH /api/admin/tracks/:id`.
-- [ ] Page dashboard : bannière, période, KPI, artiste top, barre genres, histogramme, classement + filtres synchronisés à l'URL, actions optimistes, pagination, synchro auto.
-- [ ] Tests e2e : stats sur jeu de données connu (valeurs exactes) ; filtre `status=hidden` ; `sort=count_asc` ; regex spéciale `q=(` ne plante pas.
+- [x] `GET /api/admin/stats` (agrégations `04 §5`, tranches vides complétées).
+- [x] `GET /api/admin/tracks` (filtres, tris, rang global, liste des genres) + `PATCH /api/admin/tracks/:id`.
+- [x] Page dashboard : bannière, période, KPI, artiste top, barre genres, histogramme, classement + filtres synchronisés à l'URL, actions optimistes, pagination, synchro auto.
+- [x] Tests e2e : stats sur jeu de données connu (valeurs exactes) ; filtre `status=hidden` ; `sort=count_asc` ; regex spéciale `q=(` ne plante pas.
 - **Terminé quand** : US‑7 → US‑9 OK, light + dark, tablette 768 px lisible.
 
 ## Phase 5 — Durcissement (≈ 1,5 h)
@@ -103,3 +103,9 @@ Commit à la fin de chaque phase : `feat(phase-N): …`.
 - 2026-11-25 — Limite de connexion : compteur maison des **échecs** par IP hachée (LRU, 5 / 15 min, fenêtre ancrée sur le 1er échec) plutôt que `@nestjs/throttler`, qui compterait aussi les connexions réussies. Au-delà : 429 même avec le bon mot de passe.
 - 2026-11-25 — Seed admin : un seul compte ; si `ADMIN_EMAIL` change, l'ancien compte est supprimé. Email inconnu → comparaison bcrypt sur un hash factice (pas de fuite par le timing). Le JWT n'est accepté que si l'admin existe encore.
 - 2026-11-25 — `seed:admin` = `nest build && node dist/scripts/seed-admin.js` (pas de ts-node) ; le seed tourne aussi à chaque démarrage.
+- 2026-11-25 — Histogramme « Ajouts par 15 min » en barres CSS/SVG maison au lieu de recharts (≈ 100 kB évités) : une série, barres bleues + dernière tranche rouge, info-bulle au survol/focus, tableau `sr-only`. Palette des genres validée avec le script du skill dataviz (light OK ; en dark le rose sort légèrement de la bande de luminosité, compensé par la légende + %).
+- 2026-11-25 — Pages admin chargées en lazy (`React.lazy`) : la page invité ne télécharge pas le dashboard.
+- 2026-11-25 — Stats : les KPI `range=all` (`uniqueTracks`, artiste, genres) ignorent les morceaux masqués ; `totalAdditions` / `uniqueGuests` comptent toutes les additions (comme dans `04 §5`). Timeline `all` : depuis le 1er ajout, 15 min, 30 min au-delà de 48 tranches, puis seules les 48 dernières tranches sont gardées.
+- 2026-11-25 — Classement admin : genre `null` filtré et affiché comme « Autres » ; « Plus récents » = `firstAddedAt` desc (même sens que l'onglet public) ; tri A→Z avec collation `fr`. Un morceau masqué garde le rang qu'aurait son compteur.
+- 2026-11-25 — La période (bannière) et le filtre `range` du classement partagent le même paramètre d'URL `range`. L'état « Synchro auto » est mémorisé en localStorage (`hcc-auto-sync`).
+- 2026-11-25 — Variation « Dernière heure » : badge vert pâle (`party-green/15`, texte `fg` + icône verte) car le vert de fête n'atteint pas AA en texte sur fond clair.
