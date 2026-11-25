@@ -18,6 +18,13 @@ export function validateEnv(raw: Record<string, unknown>, production = IS_PRODUC
     ADMIN_PASSWORD: raw.ADMIN_PASSWORD,
     JWT_SECRET: raw.JWT_SECRET,
   };
+  const missing = (['ADMIN_EMAIL', 'ADMIN_PASSWORD', 'JWT_SECRET'] as const).filter((k) => !input[k]);
+  if (production && !input.MONGODB_URI) missing.unshift('MONGODB_URI' as never);
+  if (missing.length) {
+    throw new Error(
+      `Configuration invalide : variable(s) manquante(s) : ${missing.join(', ')} (voir .env.example).`,
+    );
+  }
   const result = envSchema.safeParse(input);
   if (!result.success) {
     throw new Error(`Configuration invalide (voir .env.example) :\n${z.prettifyError(result.error)}`);

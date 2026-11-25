@@ -63,8 +63,8 @@ Commit à la fin de chaque phase : `feat(phase-N): …`.
 - [x] Scripts `recount` et `reset-data --yes`.
 
 ## Phase 6 — Déploiement (≈ 1 h)
-- [ ] `Dockerfile` + config hébergeur, build prod servi par Nest, cache headers.
-- [ ] Checklist `08-DEPLOYMENT.md §4`.
+- [x] `Dockerfile` + config hébergeur, build prod servi par Nest, cache headers.
+- [ ] Checklist `08-DEPLOYMENT.md §4`. _(à dérouler par le BDE : nécessite l'URI Atlas, le compte Render et de vrais téléphones — voir README « Mise en ligne »)_
 
 ## Phase 7 — P1 (si temps)
 - [ ] US‑10 Export CSV
@@ -112,3 +112,5 @@ Commit à la fin de chaque phase : `feat(phase-N): …`.
 - 2026-11-25 — Lighthouse mobile sur `/` (build prod servi par Nest, Chromium Playwright) : perf 97 · a11y 100 · bonnes pratiques 100 · SEO 100 ; LCP 2,4 s, CLS 0. Gain principal : polices **auto-hébergées** (`public/fonts`, woff2 latin/latin-ext, préchargées, cache immutable) au lieu de Google Fonts bloquant — la CSP n'autorise plus aucune origine de police tierce. `robots.txt` ajouté (`Disallow: /admin`).
 - 2026-11-25 — Logs : niveau `debug` (une ligne par appel Deezer) désactivé en production ; aucun mot de passe, IP ou guestId n'est logué (revue des appels `Logger`).
 - 2026-11-25 — Scripts `recount` / `reset-data --yes` / `seed:admin` : `nest build` puis exécution de `dist/scripts/*` ; sortie explicite (`process.exit`) pour ne pas rester bloqué sur le mongod en mémoire en local. `reset-data` sans `--yes` refuse.
+- 2026-11-25 — Déploiement : `render.yaml` (service Node *starter*, Frankfurt, health check `/api/health`, 4 secrets `sync: false`) + `Dockerfile` multi-étapes (node 22-slim, deps de prod seulement, utilisateur `node`, HEALTHCHECK). Image testée localement contre un MongoDB externe : santé OK, CSP + HSTS, cookie `Secure; HttpOnly; SameSite=Lax`, seed admin. `MONGOMS_DISABLE_POSTINSTALL=1` évite de télécharger mongod au build.
+- 2026-11-25 — `packageManager: pnpm@12.23.0` et `engines.node >= 22` dans le `package.json` racine (corepack). Message de démarrage explicite listant les variables manquantes.

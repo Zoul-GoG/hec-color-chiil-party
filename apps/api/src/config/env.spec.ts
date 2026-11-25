@@ -23,6 +23,12 @@ describe('validateEnv', () => {
   });
 
   it('rejects a missing admin email with a clear message', () => {
-    expect(() => validateEnv({ ...valid, ADMIN_EMAIL: undefined }, false)).toThrow(/ADMIN_EMAIL/);
+    expect(() => validateEnv({ ...valid, ADMIN_EMAIL: undefined }, false)).toThrow(
+      'variable(s) manquante(s) : ADMIN_EMAIL',
+    );
+    expect(() => validateEnv({}, true)).toThrow('MONGODB_URI, ADMIN_EMAIL, ADMIN_PASSWORD, JWT_SECRET');
+    expect(() => validateEnv({ ...valid, ADMIN_EMAIL: 'nope' }, false)).toThrow(
+      /ADMIN_EMAIL doit être un email valide/,
+    );
   });
 });
