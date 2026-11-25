@@ -1,8 +1,15 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { APP_GUARD } from '@nestjs/core';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { AdditionsModule } from './additions/additions.module';
+import { throttlerOptions } from './common/rate-limit';
 import { validateEnv } from './config/env';
 import { DatabaseModule } from './database/database.module';
+import { ModelsModule } from './database/models.module';
+import { DeezerModule } from './deezer/deezer.module';
 import { HealthModule } from './health/health.module';
+import { TracksModule } from './tracks/tracks.module';
 
 @Module({
   imports: [
@@ -13,8 +20,14 @@ import { HealthModule } from './health/health.module';
       envFilePath: ['.env', '../../.env'],
       validate: (raw) => validateEnv(raw),
     }),
+    ThrottlerModule.forRoot(throttlerOptions),
     DatabaseModule,
+    ModelsModule,
+    DeezerModule,
     HealthModule,
+    TracksModule,
+    AdditionsModule,
   ],
+  providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })
 export class AppModule {}

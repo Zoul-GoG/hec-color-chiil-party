@@ -31,7 +31,8 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const res = ctx.getResponse<Response>();
     const req = ctx.getRequest<Request>();
     const payload = toErrorBody(exception);
-    if (payload.statusCode >= 500) {
+    // Expected business 5xx (e.g. DEEZER_UNAVAILABLE) are already logged where they happen.
+    if (payload.statusCode >= 500 && !(exception instanceof AppException)) {
       const detail = exception instanceof Error ? (exception.stack ?? exception.message) : String(exception);
       this.logger.error(`${req.method} ${req.path} -> ${payload.statusCode} ${payload.code}`, detail);
     }

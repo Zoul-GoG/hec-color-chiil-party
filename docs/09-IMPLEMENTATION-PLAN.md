@@ -15,16 +15,16 @@ Commit à la fin de chaque phase : `feat(phase-N): …`.
 - **Terminé quand** : `pnpm dev` lance les deux apps, `curl localhost:5173/api/health` → ok, fixtures présentes.
 
 ## Phase 1 — Backend public (≈ 3 h)
-- [ ] `packages/shared` : types de `03-API.md §2` + `ErrorCode`.
-- [ ] `DeezerModule` : `search`, `getTrack`, `getAlbumGenre`, mapping + `trackKey`, dédoublonnage ISRC, cache LRU 5 min, limiteur bottleneck (20 / 5 s), file bornée, disjoncteur quota, dédoublonnage en vol, timeout 5 s, gestion `body.error`, `parsePreviewExpiry` — + tests du `05-DEEZER.md §8`.
-- [ ] Schémas `Track`, `Addition` + index (`04-DATA-MODEL.md`).
-- [ ] Décorateur `@GuestId()` (lit/valide `X-Guest-Id`).
-- [ ] `GET /api/search` (enrichi `addCount`/`addedByMe`, exclut masqués).
-- [ ] `POST /api/additions` (flux atomique §3.2, genre en tâche de fond).
-- [ ] `GET /api/tracks` (popular/recent, pagination, `addedByMe`).
-- [ ] `GET /api/tracks/:trackKey/preview` (rafraîchissement si expiré, extraits ≈ 15 min).
-- [ ] Throttling (tableau `02-ARCHITECTURE.md §6`).
-- [ ] Tests :
+- [x] `packages/shared` : types de `03-API.md §2` + `ErrorCode`.
+- [x] `DeezerModule` : `search`, `getTrack`, `getAlbumGenre`, mapping + `trackKey`, dédoublonnage ISRC, cache LRU 5 min, limiteur bottleneck (20 / 5 s), file bornée, disjoncteur quota, dédoublonnage en vol, timeout 5 s, gestion `body.error`, `parsePreviewExpiry` — + tests du `05-DEEZER.md §8`.
+- [x] Schémas `Track`, `Addition` + index (`04-DATA-MODEL.md`).
+- [x] Décorateur `@GuestId()` (lit/valide `X-Guest-Id`).
+- [x] `GET /api/search` (enrichi `addCount`/`addedByMe`, exclut masqués).
+- [x] `POST /api/additions` (flux atomique §3.2, genre en tâche de fond).
+- [x] `GET /api/tracks` (popular/recent, pagination, `addedByMe`).
+- [x] `GET /api/tracks/:trackKey/preview` (rafraîchissement si expiré, extraits ≈ 15 min).
+- [x] Throttling (tableau `02-ARCHITECTURE.md §6`).
+- [x] Tests :
   - unitaires DeezerService (fixtures, quota code 4 → retry → 503, 800 → 404, cache hit) ;
   - e2e (mongodb-memory-server, Deezer mocké) : ajout → 201 ; même invité même morceau → 200 `alreadyAddedByMe` et `addCount` inchangé ; 2ᵉ invité → `addCount=2` ; ajout de l'id 745229932 puis 1014597302 (même ISRC) par 2 invités → **un seul** track avec `addCount=2` ; 20 ajouts concurrents de 20 invités → `addCount=20` exactement ; morceau masqué → 409 ; sans `X-Guest-Id` → 400 ; tri popular correct.
 - **Terminé quand** : tous les tests passent ; `curl` manuel de chaque route conforme au contrat.
@@ -88,3 +88,8 @@ Commit à la fin de chaque phase : `feat(phase-N): …`.
 - 2026-11-25 — Script anti-flash du thème servi en fichier externe bloquant (`public/theme-init.js`) au lieu d'un script inline : même effet, et la CSP helmet reste `script-src 'self'`.
 - 2026-11-25 — Sans `MONGODB_URI` hors production, l'API démarre sur mongodb-memory-server (warning) ; en production `MONGODB_URI` est obligatoire (zod). `.env` local créé sans URI.
 - 2026-11-25 — pnpm 12 : builds autorisés via `allowBuilds` dans `pnpm-workspace.yaml` (esbuild, mongodb-memory-server, @nestjs/core).
+- 2026-11-25 — Rate-limit : `@nestjs/throttler` avec throttlers nommés (`global`, `search`, `addGuest`, `addIp`, `login`) activés par route via `@RateLimit(...)` ; clé = guestId sinon IP. Le 20/10 min compte les **tentatives** d'ajout (y compris « déjà ajouté ») — plus simple, suffisant pour R6.
+- 2026-11-25 — `GET /api/tracks/:trackKey/preview` soumis à la même limite que la recherche (40/min/invité) : il peut déclencher un appel Deezer.
+- 2026-11-25 — Ajout : pré-contrôle « masqué » sur `deezerIds` avant tout appel Deezer, puis contrôle par `trackKey` ; en cas de course sur l'upsert (E11000), une relance en mise à jour.
+- 2026-11-25 — `DeezerService.search` renvoie la liste dédoublonnée complète (≤ 15) ; le filtrage des masqués puis la coupe à `limit` (8 par défaut) se font dans `TracksService`, pour garder 8 résultats même si certains sont masqués.
+- 2026-11-25 — Certains albums Deezer n'ont aucun genre (`genres.data: []`) → `genre: null`, affiché « Autres ».
