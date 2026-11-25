@@ -30,7 +30,16 @@ export function Footer() {
           <span>{txt.footer.copyright}</span>
           <Link to="/admin/login" className="underline-offset-2 hover:text-brand-blue-text hover:underline">
             {txt.footer.admin}
-          </Link>
+          </Link>{' '}
+          |
+          <a
+            href="https://zoul.dev"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline-offset-2 hover:text-brand-blue-text hover:underline"
+          >
+            by zoul.dev
+          </a>
         </p>
       </div>
     </footer>
