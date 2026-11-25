@@ -12,6 +12,7 @@ interface Props {
   onPlusOne: (track: TrackDto, origin: HTMLElement) => void;
   isPending: (deezerId: number) => boolean;
   onFocusSearch: () => void;
+  readOnly?: boolean;
 }
 
 const TABS: { id: PublicSort; label: string }[] = [
@@ -20,7 +21,13 @@ const TABS: { id: PublicSort; label: string }[] = [
 ];
 
 /** US-4: guests' playlist with tabs, polling and "load more". */
-export function PlaylistSection({ highlightKey, onPlusOne, isPending, onFocusSearch }: Props) {
+export function PlaylistSection({
+  highlightKey,
+  onPlusOne,
+  isPending,
+  onFocusSearch,
+  readOnly = false,
+}: Props) {
   const [sort, setSort] = useState<PublicSort>('popular');
   const q = useTracks(sort);
   const tracks = q.data?.pages.flatMap((p) => p.items) ?? [];
@@ -82,7 +89,7 @@ export function PlaylistSection({ highlightKey, onPlusOne, isPending, onFocusSea
             </Button>
           </div>
         ) : tracks.length === 0 ? (
-          <EmptyPlaylist onFocusSearch={onFocusSearch} />
+          <EmptyPlaylist onFocusSearch={readOnly ? undefined : onFocusSearch} />
         ) : (
           <>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -94,6 +101,7 @@ export function PlaylistSection({ highlightKey, onPlusOne, isPending, onFocusSea
                   highlighted={t.trackKey === highlightKey}
                   pending={isPending(t.deezerId)}
                   onPlusOne={onPlusOne}
+                  readOnly={readOnly}
                 />
               ))}
             </div>
@@ -113,7 +121,7 @@ export function PlaylistSection({ highlightKey, onPlusOne, isPending, onFocusSea
   );
 }
 
-function EmptyPlaylist({ onFocusSearch }: { onFocusSearch: () => void }) {
+function EmptyPlaylist({ onFocusSearch }: { onFocusSearch?: () => void }) {
   return (
     <div className="relative flex flex-col items-center overflow-hidden rounded-lg border border-dashed border-border bg-surface px-6 py-12 text-center">
       <div aria-hidden className="relative mb-4">
@@ -125,10 +133,14 @@ function EmptyPlaylist({ onFocusSearch }: { onFocusSearch: () => void }) {
         <span className="absolute -right-2 -bottom-2 size-1.5 rotate-45 rounded-[2px] bg-party-orange" />
       </div>
       <p className="font-display text-lg font-bold text-fg">{fr.playlist.emptyTitle}</p>
-      <p className="mt-1 text-sm text-fg-muted">{fr.playlist.emptyText}</p>
-      <Button variant="primary" className="mt-5" onClick={onFocusSearch}>
-        {fr.playlist.emptyCta}
-      </Button>
+      {onFocusSearch ? (
+        <>
+          <p className="mt-1 text-sm text-fg-muted">{fr.playlist.emptyText}</p>
+          <Button variant="primary" className="mt-5" onClick={onFocusSearch}>
+            {fr.playlist.emptyCta}
+          </Button>
+        </>
+      ) : null}
     </div>
   );
 }

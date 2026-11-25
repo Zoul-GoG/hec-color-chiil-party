@@ -17,9 +17,11 @@ interface Props {
   highlighted: boolean;
   pending: boolean;
   onPlusOne: (track: TrackDto, origin: HTMLElement) => void;
+  /** Submissions closed (US-11): no +1. */
+  readOnly?: boolean;
 }
 
-export function TrackCard({ track, medal, highlighted, pending, onPlusOne }: Props) {
+export function TrackCard({ track, medal, highlighted, pending, onPlusOne, readOnly = false }: Props) {
   const ref = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -78,13 +80,14 @@ export function TrackCard({ track, medal, highlighted, pending, onPlusOne }: Pro
           label={fr.track.preview}
           source={() => ({
             resolve: () => api.preview(track.trackKey, track.deezerId).then((r) => r.previewUrl),
+            meta: { title: track.title, artist: track.artist, cover: track.coverSmall },
           })}
         />
         {track.addedByMe ? (
           <Badge variant="blue" className="h-8 px-3">
             {fr.track.addedByMe}
           </Badge>
-        ) : (
+        ) : readOnly ? null : (
           <Button
             variant="primary"
             size="sm"

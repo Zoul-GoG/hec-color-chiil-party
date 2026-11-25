@@ -25,7 +25,8 @@ async function startInMemoryMongo(): Promise<string> {
     MongooseModule.forRootAsync({
       inject: [ConfigService],
       useFactory: async (config: ConfigService<Env, true>) => {
-        const uri = config.get('MONGODB_URI', { infer: true }) ?? (await startInMemoryMongo());
+        // `||`: an empty MONGODB_URI in process.env must also fall back to the in-memory server.
+        const uri = config.get('MONGODB_URI', { infer: true }) || (await startInMemoryMongo());
         return {
           uri,
           dbName: uriHasDbName(uri) ? undefined : DEFAULT_DB_NAME,

@@ -64,6 +64,20 @@ export const fr = {
     already: 'Tu as déjà ajouté ce son 😉',
     previewUnavailable: 'Extrait indisponible',
   },
+  closed: {
+    banner: 'Les propositions sont closes, place à la fête !',
+    admin: 'Propositions',
+    open: 'Ouvertes',
+    closed: 'Closes',
+    openedToast: 'Propositions ouvertes 🎶',
+    closedToast: 'Propositions closes 🔒',
+  },
+  player: {
+    label: 'Lecteur d’extrait',
+    close: "Arrêter l'extrait",
+    play: 'Reprendre',
+    pause: 'Mettre en pause',
+  },
   playlist: {
     title: 'La playlist des invités',
     count: (n: number) => `(${n} ${plural(n, 'titre', 'titres')})`,
@@ -173,6 +187,7 @@ export const fr = {
     emptyAll: 'Aucun morceau pour l’instant. Partage le lien de la playlist !',
     copyLink: 'Copier le lien',
     copied: 'Lien copié 📋',
+    exportCsv: 'Exporter CSV',
     emptyFiltered: 'Aucun morceau ne correspond à ces filtres.',
     resetFilters: 'Réinitialiser les filtres',
     actionError: "L'action n'a pas pu être enregistrée.",

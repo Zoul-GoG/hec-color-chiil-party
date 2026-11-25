@@ -2,7 +2,7 @@ import type { AdminTrackDto, AdminTracksResponseDto, StatsDto } from '@hcc/share
 import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { AppRoutes } from '../../App';
-import { adminApi, ApiError } from '../../lib/api';
+import { adminApi, api, ApiError } from '../../lib/api';
 import { track } from '../../test/factories';
 import { renderApp } from '../../test/render';
 
@@ -44,6 +44,7 @@ const list = (items: AdminTrackDto[]): AdminTracksResponseDto => ({
 });
 
 beforeEach(() => {
+  vi.spyOn(api, 'settings').mockResolvedValue({ submissionsOpen: true, eventName: 'x', eventDate: 'x' });
   vi.spyOn(adminApi, 'me').mockResolvedValue({ email: 'bde@hec.ci' });
   vi.spyOn(adminApi, 'stats').mockResolvedValue(stats);
 });
@@ -135,5 +136,26 @@ describe('Dashboard', () => {
     expect(patch).not.toHaveBeenCalled();
     fireEvent.click(within(dialog).getByRole('button', { name: 'Masquer' }));
     await waitFor(() => expect(patch).toHaveBeenCalledWith('isrc:FR9W11916593', { hidden: true }));
+  });
+
+  it('US-10: export link carries the current filters', async () => {
+    vi.spyOn(adminApi, 'tracks').mockResolvedValue(list([adminTrack()]));
+    renderApp(<AppRoutes />, ['/admin?status=played&q=didi&page=3']);
+    const link = await screen.findByRole('link', { name: /Exporter CSV/ });
+    expect(link).toHaveAttribute(
+      'href',
+      '/api/admin/tracks/export.csv?q=didi&status=played&sort=count_desc&explicit=include&range=all',
+    );
+  });
+
+  it('US-11: admin can close submissions', async () => {
+    vi.spyOn(adminApi, 'tracks').mockResolvedValue(list([]));
+    const set = vi.spyOn(adminApi, 'setSubmissionsOpen').mockResolvedValue({ submissionsOpen: false });
+    renderApp(<AppRoutes />, ['/admin']);
+    const sw = await screen.findByRole('switch', { name: /Propositions/ });
+    await waitFor(() => expect(sw).toHaveAttribute('aria-checked', 'true'));
+    fireEvent.click(sw);
+    await waitFor(() => expect(set).toHaveBeenCalledWith(false));
+    expect(await screen.findByText('Propositions closes 🔒')).toBeInTheDocument();
   });
 });

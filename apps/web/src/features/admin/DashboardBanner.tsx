@@ -1,5 +1,6 @@
 import type { Range } from '@hcc/shared';
 import { cn } from '../../components/ui/cn';
+import { useSubmissionsOpen, useToggleSubmissions } from '../../hooks/useSettings';
 import { useNow } from '../../hooks/useNow';
 import { fr } from '../../i18n/fr';
 
@@ -13,6 +14,8 @@ export function DashboardBanner({
   generatedAt?: string;
 }) {
   const now = useNow();
+  const open = useSubmissionsOpen();
+  const toggle = useToggleSubmissions();
   const ago = generatedAt ? Math.max(0, Math.round((now - new Date(generatedAt).getTime()) / 1000)) : null;
   return (
     <section className="bg-gradient-hec rounded-xl p-5 text-white shadow-float sm:p-8">
@@ -54,6 +57,31 @@ export function DashboardBanner({
               </button>
             ))}
           </div>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={open}
+            disabled={toggle.isPending}
+            onClick={() => toggle.mutate(!open)}
+            className="inline-flex h-9 cursor-pointer items-center gap-2 rounded-full bg-white/15 px-3 text-sm font-semibold text-white hover:bg-white/25 disabled:opacity-60"
+          >
+            {fr.closed.admin} :
+            <span
+              aria-hidden
+              className={cn(
+                'relative h-5 w-9 rounded-full transition-colors',
+                open ? 'bg-white' : 'bg-white/30',
+              )}
+            >
+              <span
+                className={cn(
+                  'absolute top-0.5 left-0.5 size-4 rounded-full transition-transform',
+                  open ? 'translate-x-4 bg-brand-blue' : 'bg-white',
+                )}
+              />
+            </span>
+            {open ? fr.closed.open : fr.closed.closed}
+          </button>
           {ago !== null ? (
             <p className="tabular text-xs text-white/80" aria-live="off">
               {fr.dashboard.updated(ago)}

@@ -13,8 +13,16 @@ import { fr } from '../i18n/fr';
 
 export type AudioStatus = 'idle' | 'loading' | 'playing' | 'paused';
 
+export interface PreviewMeta {
+  title: string;
+  artist: string;
+  cover: string;
+}
+
 export interface AudioState {
   currentKey: string | null;
+  /** Shown by the mobile mini-player (US-12). */
+  meta: PreviewMeta | null;
   status: AudioStatus;
   /** 0..1 */
   progress: number;
@@ -25,11 +33,14 @@ export interface PreviewSource {
   url?: string | null;
   /** Fetches a fresh URL via GET /api/tracks/:trackKey/preview. */
   resolve: () => Promise<string | null>;
+  meta?: PreviewMeta;
 }
 
 interface AudioContextValue {
   state: AudioState;
   toggle: (key: string, source: PreviewSource) => void;
+  /** Pause / resume the current preview (mini-player). */
+  togglePause: () => void;
   stop: () => void;
 }
 
@@ -38,7 +49,7 @@ const Ctx = createContext<AudioContextValue | null>(null);
 // 1-sample silent WAV used to unlock the element synchronously inside the click (iOS).
 const SILENT = 'data:audio/wav;base64,UklGRiYAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQIAAACAgA==';
 
-const IDLE: AudioState = { currentKey: null, status: 'idle', progress: 0 };
+const IDLE: AudioState = { currentKey: null, meta: null, status: 'idle', progress: 0 };
 
 /** One shared <audio> for the whole app: a single preview plays at a time (US-2). */
 export function AudioPreviewProvider({ children }: { children: ReactNode }) {
@@ -125,24 +136,27 @@ export function AudioPreviewProvider({ children }: { children: ReactNode }) {
     setState(IDLE);
   }, []);
 
+  const togglePause = useCallback(() => {
+    const a = getAudio();
+    if (!keyRef.current) return;
+    if (a.paused) {
+      void a.play().catch(() => undefined);
+      setState((s) => ({ ...s, status: 'playing' }));
+    } else {
+      a.pause();
+      setState((s) => ({ ...s, status: 'paused' }));
+    }
+  }, [getAudio]);
+
   const toggle = useCallback(
     (key: string, source: PreviewSource) => {
       const a = getAudio();
-      if (keyRef.current === key) {
-        if (a.paused) {
-          void a.play().catch(() => undefined);
-          setState((s) => ({ ...s, status: 'playing' }));
-        } else {
-          a.pause();
-          setState((s) => ({ ...s, status: 'paused' }));
-        }
-        return;
-      }
+      if (keyRef.current === key) return togglePause();
       const token = ++tokenRef.current;
       keyRef.current = key;
       sourceRef.current = source;
       retriedRef.current = !source.url; // resolver already used once when no direct URL
-      setState({ currentKey: key, status: 'loading', progress: 0 });
+      setState({ currentKey: key, meta: source.meta ?? null, status: 'loading', progress: 0 });
       if (source.url) {
         void start(source.url, token);
         return;
@@ -155,10 +169,10 @@ export function AudioPreviewProvider({ children }: { children: ReactNode }) {
         () => token === tokenRef.current && fail(),
       );
     },
-    [fail, getAudio, start],
+    [fail, getAudio, start, togglePause],
   );
 
-  const value = useMemo(() => ({ state, toggle, stop }), [state, toggle, stop]);
+  const value = useMemo(() => ({ state, toggle, togglePause, stop }), [state, toggle, togglePause, stop]);
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
 

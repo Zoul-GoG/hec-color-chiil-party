@@ -11,6 +11,7 @@ import { DatabaseModule } from './database/database.module';
 import { ModelsModule } from './database/models.module';
 import { DeezerModule } from './deezer/deezer.module';
 import { HealthModule } from './health/health.module';
+import { SettingsModule } from './settings/settings.module';
 import { TracksModule } from './tracks/tracks.module';
 
 @Module({
@@ -31,6 +32,7 @@ import { TracksModule } from './tracks/tracks.module';
     AdditionsModule,
     AuthModule,
     AdminModule,
+    SettingsModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })

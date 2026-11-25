@@ -2,7 +2,11 @@ import type { TrackDto } from '@hcc/shared';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Footer } from '../../components/Footer';
 import { Halos } from '../../components/Halos';
+import { Lock } from 'lucide-react';
+import { useAudioPreview } from '../../audio/AudioPreviewProvider';
 import { Header } from '../../components/Header';
+import { MiniPlayer } from '../../components/MiniPlayer';
+import { useSubmissionsOpen } from '../../hooks/useSettings';
 import { useAddTrack } from '../../hooks/useAddTrack';
 import { useDocumentTitle } from '../../hooks/useDocumentTitle';
 import { fr } from '../../i18n/fr';
@@ -17,6 +21,8 @@ export function GuestPage() {
   const searchRef = useRef<SearchSectionHandle>(null);
   const [highlightKey, setHighlightKey] = useState<string | null>(null);
   const { add, isPending } = useAddTrack(setHighlightKey);
+  const open = useSubmissionsOpen();
+  const playing = useAudioPreview().state.currentKey !== null;
 
   useEffect(() => {
     if (!highlightKey) return;
@@ -34,20 +40,32 @@ export function GuestPage() {
   return (
     <div className="flex min-h-dvh flex-col">
       <Header />
-      <main className="relative isolate flex-1">
+      <main className={`relative isolate flex-1 ${playing ? 'max-sm:pb-20' : ''}`}>
         <Halos />
         <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
-          <Hero />
-          <SearchSection ref={searchRef} onAdd={add} isPending={isPending} />
+          <Hero open={open} />
+          {open ? (
+            <SearchSection ref={searchRef} onAdd={add} isPending={isPending} />
+          ) : (
+            <p
+              role="status"
+              className="mx-auto mt-8 flex max-w-2xl items-center justify-center gap-2 rounded-lg border border-border bg-surface px-4 py-4 text-center font-display font-semibold text-fg shadow-card"
+            >
+              <Lock className="size-5 shrink-0 text-brand-red-text" aria-hidden />
+              {fr.closed.banner}
+            </p>
+          )}
           <PlaylistSection
             highlightKey={highlightKey}
             onPlusOne={onPlusOne}
             isPending={isPending}
             onFocusSearch={focusSearch}
+            readOnly={!open}
           />
         </div>
       </main>
       <Footer />
+      <MiniPlayer />
     </div>
   );
 }

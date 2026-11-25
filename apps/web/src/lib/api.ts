@@ -11,6 +11,7 @@ import {
   type AddTrackResponseDto,
   type Paginated,
   type PreviewDto,
+  type PublicSettingsDto,
   type PublicSort,
   type SearchResponseDto,
   type TrackDto,
@@ -67,6 +68,11 @@ export const adminApi = {
     request<AdminMeDto>('/admin/auth/login', { method: 'POST', body: JSON.stringify(body) }),
   logout: () => request<void>('/admin/auth/logout', { method: 'POST' }),
   me: () => request<AdminMeDto>('/admin/auth/me'),
+  setSubmissionsOpen: (submissionsOpen: boolean) =>
+    request<{ submissionsOpen: boolean }>('/admin/settings', {
+      method: 'PATCH',
+      body: JSON.stringify({ submissionsOpen }),
+    }),
   stats: (range: Range) => request<StatsDto>(`/admin/stats${qs({ range })}`),
   tracks: (q: AdminTracksQuery) => request<AdminTracksResponseDto>(`/admin/tracks${qs({ ...q })}`),
   patchTrack: (trackKey: string, body: AdminTrackPatchDto) =>
@@ -77,6 +83,7 @@ export const adminApi = {
 };
 
 export const api = {
+  settings: () => request<PublicSettingsDto>('/settings/public'),
   search: (q: string, signal?: AbortSignal) => request<SearchResponseDto>(`/search${qs({ q })}`, { signal }),
   tracks: (sort: PublicSort, page: number, limit: number) =>
     request<Paginated<TrackDto>>(`/tracks${qs({ sort, page, limit })}`),

@@ -84,6 +84,46 @@ export class AdminTracksService {
     };
   }
 
+  /** US-10: same filters as the list, no pagination (docs/03 §4). */
+  async exportCsv(q: AdminTracksQueryDto): Promise<string> {
+    const filter = await this.baseFilter(q);
+    if (q.genre) filter.genre = q.genre === OTHER_GENRE ? null : q.genre;
+    const [docs, rankCounts] = await Promise.all([
+      this.tracks.find(filter).collation({ locale: 'fr', strength: 1 }).sort(SORTS[q.sort]).lean(),
+      this.rankCounts(),
+    ]);
+    const header = [
+      'rang',
+      'titre',
+      'artiste',
+      'album',
+      'genre',
+      'ajouts',
+      'premier_ajout',
+      'dernier_ajout',
+      'joue',
+      'lien_deezer',
+    ];
+    const lines = docs.map((t) =>
+      [
+        rankOf(t.addCount, rankCounts),
+        t.title,
+        t.artistName,
+        t.albumTitle,
+        t.genre ?? OTHER_GENRE,
+        t.addCount,
+        csvDate(t.firstAddedAt),
+        csvDate(t.lastAddedAt),
+        t.played ? 'oui' : 'non',
+        t.deezerLink,
+      ]
+        .map(csvCell)
+        .join(';'),
+    );
+    // BOM so Excel opens UTF-8 correctly; CRLF line endings.
+    return '\uFEFF' + [header.join(';'), ...lines].join('\r\n') + '\r\n';
+  }
+
   async patch(trackKey: string, body: AdminTrackPatchBodyDto): Promise<AdminTrackDto> {
     const $set: Partial<Track> = {};
     if (body.played !== undefined) {
@@ -101,6 +141,18 @@ export class AdminTracksService {
     const counts = await this.tracks.distinct('addCount', { hidden: false });
     return (counts as number[]).sort((a, b) => b - a);
   }
+}
+
+/** `2026-11-27 21:04` (UTC = Abidjan time). */
+function csvDate(d: Date): string {
+  return new Date(d).toISOString().slice(0, 16).replace('T', ' ');
+}
+
+/** Quotes when needed and neutralises spreadsheet formulas (CSV injection). */
+export function csvCell(value: string | number): string {
+  let s = String(value ?? '');
+  if (typeof value === 'string' && /^[=+\-@\t\r]/.test(s)) s = `'${s}`;
+  return /[;"\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
 }
 
 /** Dense rank: 1 + number of distinct visible counts strictly greater. */

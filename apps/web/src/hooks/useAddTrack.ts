@@ -3,7 +3,7 @@ import { useCallback, useState } from 'react';
 import { toast } from 'sonner';
 import { useAudioPreview } from '../audio/AudioPreviewProvider';
 import { fr } from '../i18n/fr';
-import { api } from '../lib/api';
+import { api, ApiError } from '../lib/api';
 import { celebrate } from '../lib/confetti';
 import { errorMessage } from '../lib/errors';
 
@@ -39,6 +39,8 @@ export function useAddTrack(onAdded?: (trackKey: string) => void) {
         return true;
       } catch (e) {
         toast.error(errorMessage(e));
+        if (e instanceof ApiError && e.code === 'SUBMISSIONS_CLOSED')
+          void qc.invalidateQueries({ queryKey: ['settings'] });
         return false;
       } finally {
         setPending((s) => {

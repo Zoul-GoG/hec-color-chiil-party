@@ -127,6 +127,7 @@ function SuggestionRow({
           source={() => ({
             url: item.previewUrl,
             resolve: () => api.preview(item.trackKey, item.deezerId).then((r) => r.previewUrl),
+            meta: { title: item.title, artist: item.artist, cover: item.coverSmall },
           })}
         />
         {item.addedByMe ? (

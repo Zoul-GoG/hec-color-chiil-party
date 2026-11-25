@@ -1,5 +1,14 @@
 import type { AdminSort, AdminStatus, AdminTrackDto } from '@hcc/shared';
-import { AlertTriangle, Check, ChevronLeft, ChevronRight, Link2, MoreHorizontal, Search } from 'lucide-react';
+import {
+  AlertTriangle,
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  Download,
+  Link2,
+  MoreHorizontal,
+  Search,
+} from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { PreviewButton } from '../../components/PreviewButton';
@@ -11,7 +20,7 @@ import { Chip } from '../../components/ui/Chip';
 import { cn } from '../../components/ui/cn';
 import { Skeleton } from '../../components/ui/Skeleton';
 import { useDebouncedValue } from '../../hooks/useDebouncedValue';
-import { useAdminTracks, usePatchTrack, type DashboardFilters } from '../../hooks/useDashboard';
+import { toQuery, useAdminTracks, usePatchTrack, type DashboardFilters } from '../../hooks/useDashboard';
 import { fr } from '../../i18n/fr';
 import { api } from '../../lib/api';
 import { formatTime } from '../../lib/format';
@@ -271,9 +280,23 @@ function Toolbar({ filters, update }: Pick<Props, 'filters' | 'update'>) {
           />
           {d.hideExplicit}
         </label>
+        <a
+          href={exportUrl(filters)}
+          download
+          className="inline-flex h-10 items-center gap-2 rounded-md border border-border bg-surface-2 px-3 text-sm font-semibold text-fg hover:bg-surface-3"
+        >
+          <Download className="size-4" aria-hidden /> {d.exportCsv}
+        </a>
       </div>
     </div>
   );
+}
+
+function exportUrl(f: DashboardFilters): string {
+  const { page: _page, limit: _limit, ...q } = toQuery(f);
+  const params = new URLSearchParams();
+  for (const [k, v] of Object.entries(q)) if (v !== undefined && v !== '') params.set(k, String(v));
+  return `/api/admin/tracks/export.csv?${params.toString()}`;
 }
 
 interface RowActions {
@@ -357,7 +380,10 @@ function Actions({ t, actions, confirming }: { t: AdminTrackDto; actions: RowAct
         trackKey={t.trackKey}
         title={t.title}
         available={t.hasPreview}
-        source={() => ({ resolve: () => api.preview(t.trackKey, t.deezerId).then((r) => r.previewUrl) })}
+        source={() => ({
+          resolve: () => api.preview(t.trackKey, t.deezerId).then((r) => r.previewUrl),
+          meta: { title: t.title, artist: t.artist, cover: t.coverSmall },
+        })}
       />
       {!t.hidden ? (
         <Button

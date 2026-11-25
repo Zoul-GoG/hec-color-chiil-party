@@ -7,6 +7,7 @@ import { AppException } from '../common/app.exception';
 import { hashIp, isDuplicateKeyError } from '../common/utils';
 import type { Env } from '../config/env';
 import { DeezerService } from '../deezer/deezer.service';
+import { SettingsService } from '../settings/settings.service';
 import type { DeezerTrack } from '../deezer/deezer.types';
 import { toTrackDto } from '../tracks/track.mapper';
 import { Track } from '../tracks/track.schema';
@@ -25,6 +26,7 @@ export class AdditionsService {
     @InjectModel(Track.name) private readonly tracks: Model<Track>,
     @InjectModel(Addition.name) private readonly additions: Model<Addition>,
     private readonly deezer: DeezerService,
+    private readonly settings: SettingsService,
     config: ConfigService<Env, true>,
   ) {
     this.secret = config.get('JWT_SECRET', { infer: true });
@@ -32,6 +34,7 @@ export class AdditionsService {
 
   /** Atomic add without transaction (docs/02-ARCHITECTURE.md §3.2). */
   async add(deezerId: number, guestId: string, ip: string | undefined): Promise<AddResult> {
+    await this.settings.assertOpen();
     // Cheap pre-check on a known Deezer id, before calling Deezer.
     if (await this.tracks.exists({ deezerIds: deezerId, hidden: true })) {
       throw new AppException(ErrorCode.TRACK_HIDDEN);

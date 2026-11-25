@@ -1,4 +1,5 @@
-import { Body, Controller, Get, Param, Patch, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Header, Param, Patch, Query, Res, UseGuards } from '@nestjs/common';
+import type { Response } from 'express';
 import type { AdminTrackDto, AdminTracksResponseDto, StatsDto } from '@hcc/shared';
 import { JwtCookieGuard } from './auth/jwt-cookie.guard';
 import { StatsService } from './stats/stats.service';
@@ -16,6 +17,19 @@ export class AdminController {
   @Get('stats')
   getStats(@Query() q: RangeQueryDto): Promise<StatsDto> {
     return this.stats.get(q.range);
+  }
+
+  // Declared before `tracks/:trackKey`-style routes; GET has none, but keep it first for clarity.
+  @Get('tracks/export.csv')
+  @Header('Content-Type', 'text/csv; charset=utf-8')
+  @Header('Cache-Control', 'no-store')
+  async exportCsv(
+    @Query() q: AdminTracksQueryDto,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<string> {
+    const stamp = new Date().toISOString().slice(0, 16).replace(/[-:T]/g, '');
+    res.setHeader('Content-Disposition', `attachment; filename="color-chill-classement-${stamp}.csv"`);
+    return this.tracks.exportCsv(q);
   }
 
   @Get('tracks')

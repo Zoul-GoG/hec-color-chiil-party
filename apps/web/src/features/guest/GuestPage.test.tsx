@@ -8,8 +8,11 @@ import { GuestPage } from './GuestPage';
 const input = () => screen.getByRole('combobox', { name: 'Rechercher un morceau' });
 const type = (v: string) => fireEvent.change(input(), { target: { value: v } });
 
+const settings = (submissionsOpen: boolean) => ({ submissionsOpen, eventName: 'x', eventDate: 'x' });
+
 beforeEach(() => {
   vi.spyOn(api, 'tracks').mockResolvedValue(page([]));
+  vi.spyOn(api, 'settings').mockResolvedValue(settings(true));
 });
 afterEach(() => {
   vi.restoreAllMocks();
@@ -191,5 +194,33 @@ describe('Playlist (US-4)', () => {
     renderApp(<GuestPage />);
     fireEvent.click(await screen.findByRole('tab', { name: '✨ Récemment ajoutés' }));
     await waitFor(() => expect(api.tracks).toHaveBeenCalledWith('recent', 1, 24));
+  });
+});
+
+describe('P1', () => {
+  it('US-11: closed submissions -> banner, no search, no +1', async () => {
+    vi.mocked(api.settings).mockResolvedValue(settings(false));
+    vi.mocked(api.tracks).mockResolvedValue(page([track()]));
+    renderApp(<GuestPage />);
+    expect(await screen.findByRole('status')).toHaveTextContent(
+      'Les propositions sont closes, place à la fête !',
+    );
+    expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
+    expect(screen.getByText('Propositions closes')).toBeInTheDocument();
+    await screen.findByRole('article', { name: 'Bâtiment — Niska' });
+    expect(screen.queryByRole('button', { name: /Moi aussi/ })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Écouter un extrait/ })).toBeInTheDocument();
+  });
+
+  it('US-12: mini-player shows the playing track and stops it', async () => {
+    vi.mocked(api.tracks).mockResolvedValue(page([track()]));
+    vi.spyOn(api, 'preview').mockResolvedValue({ previewUrl: 'https://cdnt-preview.dzcdn.net/x.mp3' });
+    renderApp(<GuestPage />);
+    fireEvent.click(await screen.findByRole('button', { name: 'Écouter un extrait de Bâtiment' }));
+    const player = await screen.findByRole('region', { name: 'Lecteur d’extrait' });
+    expect(within(player).getByText('Bâtiment')).toBeInTheDocument();
+    expect(within(player).getByText('Niska')).toBeInTheDocument();
+    fireEvent.click(within(player).getByRole('button', { name: "Arrêter l'extrait" }));
+    expect(screen.queryByRole('region', { name: 'Lecteur d’extrait' })).not.toBeInTheDocument();
   });
 });

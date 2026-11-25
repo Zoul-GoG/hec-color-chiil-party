@@ -13,7 +13,7 @@ export function useLogout() {
   const qc = useQueryClient();
   const navigate = useNavigate();
   return useMutation({
-    mutationFn: adminApi.logout,
+    mutationFn: () => adminApi.logout(),
     onSettled: () => {
       qc.removeQueries({ queryKey: ['admin'] });
       navigate('/admin/login', { replace: true });

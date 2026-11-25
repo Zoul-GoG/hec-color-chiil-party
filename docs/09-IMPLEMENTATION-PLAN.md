@@ -67,11 +67,11 @@ Commit à la fin de chaque phase : `feat(phase-N): …`.
 - [ ] Checklist `08-DEPLOYMENT.md §4`. _(à dérouler par le BDE : nécessite l'URI Atlas, le compte Render et de vrais téléphones — voir README « Mise en ligne »)_
 
 ## Phase 7 — P1 (si temps)
-- [ ] US‑10 Export CSV
-- [ ] US‑11 Ouvrir/fermer les propositions (+ `GET /api/settings/public`)
-- [ ] US‑12 Mini‑lecteur mobile
-- [ ] US‑13 Raccourci ⌘K
-- [ ] US‑14 Playwright smoke (recherche → ajout → carte visible ; login → dashboard)
+- [x] US‑10 Export CSV
+- [x] US‑11 Ouvrir/fermer les propositions (+ `GET /api/settings/public`)
+- [x] US‑12 Mini‑lecteur mobile
+- [x] US‑13 Raccourci ⌘K
+- [x] US‑14 Playwright smoke (recherche → ajout → carte visible ; login → dashboard)
 
 ---
 
@@ -114,3 +114,7 @@ Commit à la fin de chaque phase : `feat(phase-N): …`.
 - 2026-11-25 — Scripts `recount` / `reset-data --yes` / `seed:admin` : `nest build` puis exécution de `dist/scripts/*` ; sortie explicite (`process.exit`) pour ne pas rester bloqué sur le mongod en mémoire en local. `reset-data` sans `--yes` refuse.
 - 2026-11-25 — Déploiement : `render.yaml` (service Node *starter*, Frankfurt, health check `/api/health`, 4 secrets `sync: false`) + `Dockerfile` multi-étapes (node 22-slim, deps de prod seulement, utilisateur `node`, HEALTHCHECK). Image testée localement contre un MongoDB externe : santé OK, CSP + HSTS, cookie `Secure; HttpOnly; SameSite=Lax`, seed admin. `MONGOMS_DISABLE_POSTINSTALL=1` évite de télécharger mongod au build.
 - 2026-11-25 — `packageManager: pnpm@12.23.0` et `engines.node >= 22` dans le `package.json` racine (corepack). Message de démarrage explicite listant les variables manquantes.
+- 2026-11-25 — US-11 : document `settings` (`_id: "global"`), lu à chaque ajout (403 `SUBMISSIONS_CLOSED`). Fermé → page invité en lecture seule : bannière, recherche et « +1 » masqués, extraits toujours écoutables ; badge du hero gris « Propositions closes ». Le front tolère l'absence de la route (ouvert par défaut). Interrupteur dans la bannière du dashboard.
+- 2026-11-25 — US-10 : export CSV = mêmes filtres que la liste, sans pagination, BOM + `;` + CRLF, dates `AAAA-MM-JJ HH:mm` (UTC = heure d'Abidjan), `joue` = oui/non, genre `null` → « Autres » ; cellules commençant par `= + - @` préfixées d'une apostrophe (injection de formules). Bouton = simple lien (cookie `path=/api` envoyé).
+- 2026-11-25 — US-12 : mini-lecteur `< 640 px` (titre, artiste, progression rouge, pause/reprise, ✕) alimenté par des métadonnées passées au provider audio.
+- 2026-11-25 — US-14 : `pnpm e2e` (build prod + Playwright, projets Pixel 7 et Desktop Chrome, MongoDB en mémoire, **vrai Deezer**) — hors de `pnpm test` car dépendant du réseau. Il a révélé un bug corrigé : `MONGODB_URI=""` ne déclenchait pas le repli en mémoire (`??` → `||`).
