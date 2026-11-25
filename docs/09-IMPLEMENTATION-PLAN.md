@@ -30,16 +30,16 @@ Commit à la fin de chaque phase : `feat(phase-N): …`.
 - **Terminé quand** : tous les tests passent ; `curl` manuel de chaque route conforme au contrat.
 
 ## Phase 2 — Front invité (≈ 4 h)
-- [ ] Tailwind v4 + `styles/tokens.css` (copie de `06 §3`), polices, script anti‑flash, `ThemeProvider` + `ThemeToggle` (localStorage `hcc-theme`).
-- [ ] `lib/guestId.ts` (UUID via `crypto.randomUUID()`, clé `hcc-guest-id`), `lib/api.ts` (fetch typé, en‑tête `X-Guest-Id`, parse erreurs → `ApiError{code}`), `i18n/fr.ts`.
-- [ ] Composants UI de base (Button, Badge, CountBadge, Chip, Card, Skeleton, PreviewButton), Header, Footer.
-- [ ] `AudioPreviewProvider` : un seul `HTMLAudioElement`, `play(trackKey, urlOrResolver)`, `pause()`, état `{currentKey, progress, status}`, stop à la fin, retry via `/preview` sur erreur.
-- [ ] `SearchBox` + `useDebouncedValue` + `useSearch` (TanStack Query, `enabled: q.length>=2`, `signal` d'annulation, `staleTime` 60 s) + chips d'idées.
-- [ ] `SuggestionList` avec tous ses états.
-- [ ] `useAddTrack` (mutation) : stop audio → vider input → toasts selon réponse → confettis → `invalidateQueries(['tracks'])` → highlight.
-- [ ] `PlaylistGrid` + `TrackCard` + onglets + « Charger plus » (`useInfiniteQuery`) + polling 15 s + bouton « +1 ».
-- [ ] Responsive 375 / 768 / 1280 ; light + dark ; `prefers-reduced-motion`.
-- [ ] Tests Vitest : debounce (pas d'appel avant 1000 ms ni sous 3 caractères, 1 seul appel après frappe rapide) ; après ajout l'input est vide et les suggestions masquées ; toast affiché avec titre et artiste ; « Ajouté ✓ » quand `addedByMe`.
+- [x] Tailwind v4 + `styles/tokens.css` (copie de `06 §3`), polices, script anti‑flash, `ThemeProvider` + `ThemeToggle` (localStorage `hcc-theme`).
+- [x] `lib/guestId.ts` (UUID via `crypto.randomUUID()`, clé `hcc-guest-id`), `lib/api.ts` (fetch typé, en‑tête `X-Guest-Id`, parse erreurs → `ApiError{code}`), `i18n/fr.ts`.
+- [x] Composants UI de base (Button, Badge, CountBadge, Chip, Card, Skeleton, PreviewButton), Header, Footer.
+- [x] `AudioPreviewProvider` : un seul `HTMLAudioElement`, `play(trackKey, urlOrResolver)`, `pause()`, état `{currentKey, progress, status}`, stop à la fin, retry via `/preview` sur erreur.
+- [x] `SearchBox` + `useDebouncedValue` + `useSearch` (TanStack Query, `enabled: q.length>=2`, `signal` d'annulation, `staleTime` 60 s) + chips d'idées.
+- [x] `SuggestionList` avec tous ses états.
+- [x] `useAddTrack` (mutation) : stop audio → vider input → toasts selon réponse → confettis → `invalidateQueries(['tracks'])` → highlight.
+- [x] `PlaylistGrid` + `TrackCard` + onglets + « Charger plus » (`useInfiniteQuery`) + polling 15 s + bouton « +1 ».
+- [x] Responsive 375 / 768 / 1280 ; light + dark ; `prefers-reduced-motion`.
+- [x] Tests Vitest : debounce (pas d'appel avant 1000 ms ni sous 3 caractères, 1 seul appel après frappe rapide) ; après ajout l'input est vide et les suggestions masquées ; toast affiché avec titre et artiste ; « Ajouté ✓ » quand `addedByMe`.
 - **Terminé quand** : parcours US‑1 → US‑5 réalisable de bout en bout sur mobile, en light et dark.
 
 ## Phase 3 — Auth admin (≈ 1,5 h)
@@ -93,3 +93,10 @@ Commit à la fin de chaque phase : `feat(phase-N): …`.
 - 2026-11-25 — Ajout : pré-contrôle « masqué » sur `deezerIds` avant tout appel Deezer, puis contrôle par `trackKey` ; en cas de course sur l'upsert (E11000), une relance en mise à jour.
 - 2026-11-25 — `DeezerService.search` renvoie la liste dédoublonnée complète (≤ 15) ; le filtrage des masqués puis la coupe à `limit` (8 par défaut) se font dans `TracksService`, pour garder 8 résultats même si certains sont masqués.
 - 2026-11-25 — Certains albums Deezer n'ont aucun genre (`genres.data: []`) → `genre: null`, affiché « Autres ».
+- 2026-11-25 — `useSearch` : `enabled` à **3** caractères et `staleTime` **5 min** (le plan Phase 2 disait 2 car. / 60 s) — on suit le PRD US-1 et `05-DEEZER §5`, plus prudents envers Deezer.
+- 2026-11-25 — L'input est vidé **après** la réponse de l'API (et pas au clic) : en cas d'erreur, l'invité garde sa recherche. L'audio est coupé dès le clic.
+- 2026-11-25 — iOS : pour les extraits résolus via `/preview` (playlist, dashboard), un WAV silencieux est joué de façon synchrone dans le clic pour débloquer l'élément audio avant l'appel réseau.
+- 2026-11-25 — Raccourci ⌘K / Ctrl+K branché dès la Phase 2 (le badge ⌘K du design system l'annonce) ; US-13 sera cochée en Phase 7.
+- 2026-11-25 — Highlight après ajout : anneau rouge 2 s ; défilement doux seulement si la carte est déjà partiellement à l'écran (pas de saut de page pendant que le focus revient dans l'input).
+- 2026-11-25 — Vitest sous Node ≥ 22 : `--no-experimental-webstorage` dans les workers (le `localStorage` natif de Node masque celui de jsdom).
+- 2026-11-25 — Vérif visuelle : captures Playwright (Chromium headless) light/dark × 375/1280 + parcours réel (recherche → extrait → ajout → toast → highlight) sans erreur console.

@@ -6,7 +6,7 @@ import prettier from 'eslint-config-prettier';
 import globals from 'globals';
 
 export default tseslint.config(
-  { ignores: ['**/dist/**', '**/coverage/**', 'design-references/**', '**/node_modules/**'] },
+  { ignores: ['**/dist/**', '**/coverage/**', 'design-references/**', '**/node_modules/**', '*.tmp.mjs'] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
@@ -24,7 +24,7 @@ export default tseslint.config(
     plugins: { 'react-hooks': reactHooks, 'react-refresh': reactRefresh },
     rules: {
       ...reactHooks.configs.recommended.rules,
-      'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
+      'react-refresh/only-export-components': 'off',
     },
   },
   prettier,

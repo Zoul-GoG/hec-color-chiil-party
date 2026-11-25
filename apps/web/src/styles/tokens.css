@@ -1,0 +1,123 @@
+/* Copied verbatim from docs/06-DESIGN-SYSTEM.md §3 — do not edit here without updating the doc. */
+@import 'tailwindcss';
+
+/* Dark mode piloté par la classe .dark sur <html> */
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  /* Marque */
+  --hec-blue: #0652dd;
+  --hec-blue-hover: #0544b8;
+  --hec-blue-soft: #e7eefd; /* fonds de badge/filtre */
+  --hec-blue-text: #0652dd; /* liens, texte bleu */
+  --hec-red: #e02424;
+  --hec-red-hover: #c81e1e;
+  --hec-red-soft: #fdecec;
+  --hec-red-text: #c81e1e;
+
+  /* Surfaces & texte */
+  --bg: #f7f8fc;
+  --surface: #ffffff;
+  --surface-2: #f1f4fa; /* inputs, zones en retrait */
+  --surface-3: #e7ecf5; /* hover */
+  --border: #e2e8f0;
+  --fg: #0f172a;
+  --fg-muted: #475569;
+  --fg-subtle: #64748b;
+  --overlay: rgb(15 23 42 / 0.55);
+
+  /* Fête (affiche Color & Chill) */
+  --party-pink: #ff3ea5;
+  --party-yellow: #ffc93c;
+  --party-green: #22c55e;
+  --party-purple: #8b5cf6;
+  --party-orange: #ff8a1f;
+
+  /* Ombres */
+  --shadow-sm: 0 1px 3px rgb(15 23 42 / 0.06), 0 1px 2px rgb(15 23 42 / 0.04);
+  --shadow-lg: 0 10px 25px -5px rgb(15 23 42 / 0.08), 0 4px 10px -2px rgb(15 23 42 / 0.04);
+  --glow-red: 0 6px 20px rgb(224 36 36 / 0.25);
+}
+
+.dark {
+  --hec-blue: #2e6bf0; /* fond de bouton, texte blanc AA 4.7:1 */
+  --hec-blue-hover: #4a80f5;
+  --hec-blue-soft: rgb(46 107 240 / 0.16);
+  --hec-blue-text: #7ea6ff; /* 7.2:1 sur surface */
+  --hec-red: #e02424;
+  --hec-red-hover: #f03a3a;
+  --hec-red-soft: rgb(224 36 36 / 0.16);
+  --hec-red-text: #ff6b6b; /* 6.2:1 sur surface */
+
+  --bg: #0b1020;
+  --surface: #121a2e;
+  --surface-2: #18223a;
+  --surface-3: #22304d;
+  --border: rgb(255 255 255 / 0.08);
+  --fg: #f1f5ff;
+  --fg-muted: #a9b4cc;
+  --fg-subtle: #8592ad;
+  --overlay: rgb(0 0 0 / 0.6);
+
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
+  --shadow-lg: 0 16px 40px rgb(0 0 0 / 0.5), 0 0 24px rgb(46 107 240 / 0.12);
+  --glow-red: 0 0 20px rgb(224 36 36 / 0.45);
+}
+
+@theme inline {
+  --color-brand-blue: var(--hec-blue);
+  --color-brand-blue-hover: var(--hec-blue-hover);
+  --color-brand-blue-soft: var(--hec-blue-soft);
+  --color-brand-blue-text: var(--hec-blue-text);
+  --color-brand-red: var(--hec-red);
+  --color-brand-red-hover: var(--hec-red-hover);
+  --color-brand-red-soft: var(--hec-red-soft);
+  --color-brand-red-text: var(--hec-red-text);
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-border: var(--border);
+  --color-fg: var(--fg);
+  --color-fg-muted: var(--fg-muted);
+  --color-fg-subtle: var(--fg-subtle);
+  --color-party-pink: var(--party-pink);
+  --color-party-yellow: var(--party-yellow);
+  --color-party-green: var(--party-green);
+  --color-party-purple: var(--party-purple);
+  --color-party-orange: var(--party-orange);
+
+  --font-display: 'Sora', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+
+  --shadow-card: var(--shadow-sm);
+  --shadow-float: var(--shadow-lg);
+  --shadow-glow-red: var(--glow-red);
+}
+
+html {
+  color-scheme: light;
+}
+html.dark {
+  color-scheme: dark;
+}
+body {
+  @apply bg-bg text-fg font-sans antialiased;
+}
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

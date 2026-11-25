@@ -1,5 +1,105 @@
-/** All UI strings (French, festive tone). */
+import type { ErrorCode } from '@hcc/shared';
+
+const plural = (n: number, one: string, many: string) => (n > 1 ? many : one);
+
+/** All UI strings (French, tutoiement, festive tone) — docs/07-SCREENS.md. */
 export const fr = {
-  appTitle: 'HEC Color & Chill Party · Playlist',
-  brand: 'Color & Chill',
+  titles: {
+    home: 'HEC Color & Chill Party · Playlist',
+    login: 'Connexion admin · Color & Chill',
+    dashboard: 'Dashboard · Color & Chill',
+    notFound: 'Page introuvable · Color & Chill',
+  },
+  brand: {
+    name: 'Color & Chill',
+    logoAlt: 'HEC Abidjan',
+  },
+  theme: {
+    toDark: 'Activer le mode sombre',
+    toLight: 'Activer le mode clair',
+  },
+  hero: {
+    date: 'VENDREDI 27 NOV. · HEC ABIDJAN',
+    open: 'Playlist ouverte',
+    closed: 'Propositions closes',
+    titleBefore: 'Choisis le son de la ',
+    titleColor: 'Color',
+    titleAfter: ' & Chill Party',
+    subtitle:
+      "Cherche un morceau, écoute l'extrait et ajoute-le à la playlist de la soirée. Plus il est ajouté, plus il a de chances de passer !",
+  },
+  search: {
+    label: 'Rechercher un morceau',
+    placeholder: 'Un titre, un artiste… (ex. Didi B, Burna Boy, Magic System)',
+    clear: 'Effacer la recherche',
+    ideas: 'Idées :',
+    ideaChips: ['Coupé-Décalé', 'Afrobeats', 'Amapiano', 'Rap Ivoire', 'Zouglou', 'Afro House'],
+    limitHint: "Tu peux ajouter jusqu'à 20 sons.",
+    resultsHeader: 'RÉSULTATS DEEZER',
+    resultsCount: (n: number) => `${n} ${plural(n, 'résultat', 'résultats')}`,
+    empty: (q: string) => `Aucun résultat pour « ${q} ». Essaie avec l'artiste ou une autre orthographe.`,
+    retry: 'Réessayer',
+    loading: 'Recherche en cours…',
+  },
+  track: {
+    explicit: 'Explicite',
+    alreadyAdded: (n: number) => `Déjà ajouté ×${n}`,
+    addedByMe: 'Ajouté ✓',
+    add: 'Ajouter',
+    addAria: (title: string) => `Ajouter « ${title} » à la playlist`,
+    plusOne: 'Moi aussi',
+    plusOneAria: (title: string) => `Moi aussi, j'ajoute « ${title} »`,
+    preview: 'Extrait',
+    playAria: (title: string) => `Écouter un extrait de ${title}`,
+    pauseAria: 'Mettre en pause',
+    noPreview: 'Extrait indisponible',
+    countTitle: (n: number) => `Ajouté par ${n} ${plural(n, 'invité', 'invités')}`,
+    medal: ['🥇', '🥈', '🥉'] as const,
+    rankAria: (n: number) => `${n}e place`,
+  },
+  toasts: {
+    created: (title: string, artist: string) => `🎉 « ${title} » de ${artist} est dans la playlist !`,
+    joined: (title: string, n: number) =>
+      `🔥 « ${title} » ajouté ! Tu rejoins ${n} ${plural(n, 'autre invité', 'autres invités')}.`,
+    already: 'Tu as déjà ajouté ce son 😉',
+    previewUnavailable: 'Extrait indisponible',
+  },
+  playlist: {
+    title: 'La playlist des invités',
+    count: (n: number) => `(${n} ${plural(n, 'titre', 'titres')})`,
+    tabsLabel: 'Trier la playlist',
+    popular: '🔥 Les plus ajoutés',
+    recent: '✨ Récemment ajoutés',
+    loadMore: 'Charger plus',
+    end: "C'est tout pour l'instant — ajoute le prochain hit !",
+    emptyTitle: 'La piste de danse est vide…',
+    emptyText: 'Sois le premier à proposer un son !',
+    emptyCta: 'Proposer un son',
+    error: 'Impossible de charger la playlist.',
+    retry: 'Réessayer',
+  },
+  footer: {
+    org: 'HEC Abidjan · BDE',
+    event: 'Color & Chill Party · 27.11.2026',
+    deezer: 'Musique via Deezer',
+    copyright: '© 2026',
+    admin: 'Espace BDE',
+  },
+  notFound: {
+    title: "Cette page n'est pas sur la playlist.",
+    back: "Retour à l'accueil",
+  },
+  errors: {
+    VALIDATION_ERROR: 'Requête invalide.',
+    INVALID_GUEST_ID: 'Recharge la page et réessaie.',
+    UNAUTHORIZED: 'Connecte-toi pour continuer.',
+    INVALID_CREDENTIALS: 'Email ou mot de passe incorrect.',
+    NOT_FOUND: 'Introuvable.',
+    TRACK_NOT_FOUND: 'Morceau introuvable.',
+    TRACK_HIDDEN: "Ce morceau n'est pas disponible pour la soirée.",
+    SUBMISSIONS_CLOSED: 'Les propositions sont closes, place à la fête !',
+    RATE_LIMITED: 'Doucement DJ 😅 Réessaie dans un instant.',
+    DEEZER_UNAVAILABLE: 'La recherche est momentanément indisponible.',
+    INTERNAL_ERROR: 'Oups, une erreur est survenue.',
+  } satisfies Record<ErrorCode, string>,
 } as const;

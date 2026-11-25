@@ -1,0 +1,69 @@
+@import './tokens.css';
+
+/* App-level additions on top of the design tokens. */
+@theme {
+  --animate-pop: pop 320ms ease-out;
+  --animate-fade-in: fade-in 200ms ease-out;
+}
+
+@keyframes pop {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* "Color" festive gradient (docs/06 §7). */
+.text-gradient-color {
+  background-image: linear-gradient(
+    90deg,
+    var(--party-pink),
+    var(--party-yellow),
+    var(--party-green),
+    var(--hec-blue),
+    var(--party-purple)
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Admin banner gradient, identical in both themes (docs/07 §3.2). */
+.bg-gradient-hec {
+  background-image: linear-gradient(120deg, #0652dd, #e02424);
+}
+
+/* Login page background (light) (docs/07 §2). */
+.bg-gradient-login {
+  background-image: linear-gradient(160deg, #0652dd, #0544b8);
+}
+
+/* Fallback cover when Deezer images fail. */
+.bg-cover-fallback {
+  background-image: linear-gradient(135deg, var(--party-purple), var(--hec-blue), var(--party-pink));
+}
+
+:focus-visible {
+  outline: 2px solid var(--hec-blue);
+  outline-offset: 2px;
+}
+
+input[type='search']::-webkit-search-cancel-button {
+  display: none;
+}

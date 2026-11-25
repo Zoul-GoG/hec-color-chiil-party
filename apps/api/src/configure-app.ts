@@ -27,7 +27,7 @@ export function configureApp(app: NestExpressApplication): void {
           styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
           fontSrc: ["'self'", 'https://fonts.gstatic.com'],
           imgSrc: ["'self'", 'data:', 'https://*.dzcdn.net'],
-          mediaSrc: ["'self'", 'https://*.dzcdn.net'],
+          mediaSrc: ["'self'", 'data:', 'https://*.dzcdn.net'],
           connectSrc: ["'self'"],
         },
       },
