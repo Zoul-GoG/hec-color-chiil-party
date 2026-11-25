@@ -5,7 +5,9 @@ services:
     name: hec-color-chill
     runtime: node
     region: frankfurt
-    plan: starter # does not sleep (the free plan does)
+    # Free plan: sleeps after 15 min without traffic (~1 min cold start) and has no shell.
+    # Keep it awake on party night with an external ping on /api/health (see README).
+    plan: free
     buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm build
     startCommand: pnpm start
     healthCheckPath: /api/health
