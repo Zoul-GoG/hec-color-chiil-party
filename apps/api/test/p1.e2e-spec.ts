@@ -135,14 +135,12 @@ describe('P1 features (e2e)', () => {
         'Ajouts',
         'Premier ajout',
         'Dernier ajout',
-        'Joué',
         'Lien Deezer',
       ]);
       expect(rows).toHaveLength(2);
       expect(rows[1].slice(1, 7)).toEqual([1, 'Bâtiment', 'Niska', 'Mr Sal', 'Rap/Hip Hop', 2]);
       expect(rows[1][7]).toBeInstanceOf(Date);
-      expect(rows[1][9]).toBe('oui');
-      expect(rows[1][10]).toMatchObject({ hyperlink: 'https://www.deezer.com/track/745229932' });
+      expect(rows[1][9]).toMatchObject({ hyperlink: 'https://www.deezer.com/track/745229932' });
 
       await t.trackModel.updateOne({}, { $set: { hidden: true } });
       expect(await readRows((await download('/api/admin/tracks/export.xlsx')).body as Buffer)).toHaveLength(

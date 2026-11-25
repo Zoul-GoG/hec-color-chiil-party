@@ -1,7 +1,6 @@
 import type { AdminSort, AdminTrackDto } from '@hcc/shared';
 import {
   AlertTriangle,
-  Check,
   ChevronLeft,
   ChevronRight,
   Download,
@@ -45,7 +44,6 @@ export function TracksPanel({ filters, update, reset }: Props) {
   const hasFilters = Boolean(filters.q || filters.genre || filters.range === '1h');
 
   const actions: RowActions = {
-    togglePlayed: (t) => patch.mutate({ trackKey: t.trackKey, patch: { played: !t.played } }),
     askHide: (t) => setConfirmKey(t.trackKey),
     cancelHide: () => setConfirmKey(null),
     confirmHide: (t) => {
@@ -269,7 +267,6 @@ function exportUrl(f: DashboardFilters): string {
 }
 
 interface RowActions {
-  togglePlayed: (t: AdminTrackDto) => void;
   askHide: (t: AdminTrackDto) => void;
   cancelHide: () => void;
   confirmHide: (t: AdminTrackDto) => void;
@@ -293,14 +290,7 @@ function TrackInfo({ t }: { t: AdminTrackDto }) {
       <TrackCover src={t.coverSmall} size={48} />
       <div className="min-w-0">
         <div className="flex min-w-0 items-center gap-1.5">
-          <p
-            className={cn(
-              'truncate font-display font-semibold text-fg',
-              t.played && 'line-through decoration-fg-subtle decoration-1',
-            )}
-          >
-            {t.title}
-          </p>
+          <p className="truncate font-display font-semibold text-fg">{t.title}</p>
           {t.explicit ? <ExplicitBadge label={fr.track.explicit} /> : null}
           {t.hidden ? <Badge>{d.hiddenBadge}</Badge> : null}
         </div>
@@ -355,23 +345,6 @@ function Actions({ t, actions, confirming }: { t: AdminTrackDto; actions: RowAct
           meta: { title: t.title, artist: t.artist, cover: t.coverSmall },
         })}
       />
-      {!t.hidden ? (
-        <Button
-          size="sm"
-          variant={t.played ? 'brand' : 'secondary'}
-          aria-pressed={t.played}
-          aria-label={t.played ? d.markUnplayed(t.title) : d.markPlayed(t.title)}
-          onClick={() => actions.togglePlayed(t)}
-        >
-          {t.played ? (
-            d.played
-          ) : (
-            <>
-              <Check className="size-4" aria-hidden /> Joué
-            </>
-          )}
-        </Button>
-      ) : null}
       <div className="relative" ref={menuRef}>
         <Button
           size="icon-sm"
@@ -418,13 +391,7 @@ function TableRow({
   confirming: boolean;
 }) {
   return (
-    <tr
-      className={cn(
-        'transition-opacity hover:bg-surface-2/60',
-        t.played && 'opacity-60',
-        t.hidden && 'opacity-60',
-      )}
-    >
+    <tr className={cn('transition-opacity hover:bg-surface-2/60', t.hidden && 'opacity-60')}>
       <td className="py-3 pr-3 pl-6">
         <Rank rank={t.rank} hidden={t.hidden} />
       </td>
@@ -462,7 +429,7 @@ function MobileRow({
   confirming: boolean;
 }) {
   return (
-    <li className={cn('flex flex-col gap-3 px-4 py-3', (t.played || t.hidden) && 'opacity-60')}>
+    <li className={cn('flex flex-col gap-3 px-4 py-3', t.hidden && 'opacity-60')}>
       <div className="flex items-center gap-3">
         <div className="w-9 shrink-0 text-center">
           <Rank rank={t.rank} hidden={t.hidden} />

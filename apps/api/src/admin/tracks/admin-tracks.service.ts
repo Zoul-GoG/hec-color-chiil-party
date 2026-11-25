@@ -103,7 +103,6 @@ export class AdminTracksService {
       { header: 'Ajouts', key: 'count', width: 9 },
       { header: 'Premier ajout', key: 'first', width: 17, style: { numFmt: 'dd/mm/yyyy hh:mm' } },
       { header: 'Dernier ajout', key: 'last', width: 17, style: { numFmt: 'dd/mm/yyyy hh:mm' } },
-      { header: 'Joué', key: 'played', width: 7 },
       { header: 'Lien Deezer', key: 'link', width: 38 },
     ];
     // Cells are written as plain values (never formulas), so there is no formula-injection risk.
@@ -117,14 +116,13 @@ export class AdminTracksService {
         count: t.addCount,
         first: new Date(t.firstAddedAt),
         last: new Date(t.lastAddedAt),
-        played: t.played ? 'oui' : 'non',
         link: t.deezerLink ? { text: t.deezerLink, hyperlink: t.deezerLink } : '',
       });
     }
     const header = ws.getRow(1);
     header.font = { bold: true };
     header.alignment = { vertical: 'middle' };
-    ws.autoFilter = { from: 'A1', to: 'J1' };
+    ws.autoFilter = { from: 'A1', to: 'I1' };
     return Buffer.from(await wb.xlsx.writeBuffer());
   }
 

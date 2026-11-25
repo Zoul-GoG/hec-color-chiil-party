@@ -94,31 +94,22 @@ describe('Dashboard', () => {
     expect(screen.getByRole('button', { name: /Copier le lien/ })).toBeInTheDocument();
   });
 
-  it('marks as played optimistically', async () => {
+  it('no "Joué" button anymore', async () => {
     vi.spyOn(adminApi, 'tracks').mockResolvedValue(list([adminTrack()]));
-    let resolve!: (v: AdminTrackDto) => void;
-    const patch = vi.spyOn(adminApi, 'patchTrack').mockReturnValue(new Promise((r) => (resolve = r)));
     renderApp(<AppRoutes />, ['/admin']);
-    const [btn] = await screen.findAllByRole('button', { name: 'Marquer « Bâtiment » comme joué' });
-    fireEvent.click(btn);
-    await waitFor(() => expect(patch).toHaveBeenCalledWith('isrc:FR9W11916593', { played: true }));
-    // Optimistic: the toggle flips before the server answers.
-    expect(
-      (await screen.findAllByRole('button', { name: 'Marquer « Bâtiment » comme non joué' })).length,
-    ).toBeGreaterThan(0);
-    resolve(adminTrack({ played: true }));
+    await screen.findAllByRole('button', { name: "Plus d'actions pour « Bâtiment »" });
+    expect(screen.queryByRole('button', { name: /Joué|joué/ })).not.toBeInTheDocument();
   });
 
-  it('rolls back and toasts on error', async () => {
-    vi.spyOn(adminApi, 'tracks').mockResolvedValue(list([adminTrack()]));
+  it('unhide is optimistic, rolls back and toasts on error', async () => {
+    vi.spyOn(adminApi, 'tracks').mockResolvedValue(list([adminTrack({ hidden: true })]));
     vi.spyOn(adminApi, 'patchTrack').mockRejectedValue(new ApiError(500, 'INTERNAL_ERROR', 'x'));
     renderApp(<AppRoutes />, ['/admin']);
-    const [btn] = await screen.findAllByRole('button', { name: 'Marquer « Bâtiment » comme joué' });
-    fireEvent.click(btn);
+    const [more] = await screen.findAllByRole('button', { name: "Plus d'actions pour « Bâtiment »" });
+    fireEvent.click(more);
+    fireEvent.click(screen.getByRole('menuitem', { name: 'Réafficher' }));
     expect(await screen.findByText("L'action n'a pas pu être enregistrée.")).toBeInTheDocument();
-    expect(
-      (await screen.findAllByRole('button', { name: 'Marquer « Bâtiment » comme joué' })).length,
-    ).toBeGreaterThan(0);
+    expect((await screen.findAllByText('Masqué')).length).toBeGreaterThan(0);
   });
 
   it('hiding asks for an inline confirmation', async () => {
