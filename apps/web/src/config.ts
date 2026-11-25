@@ -8,5 +8,4 @@ export const ADMIN_PAGE_SIZE = 50;
 export const STORAGE_KEYS = {
   theme: 'hcc-theme',
   guestId: 'hcc-guest-id',
-  autoSync: 'hcc-auto-sync',
 } as const;

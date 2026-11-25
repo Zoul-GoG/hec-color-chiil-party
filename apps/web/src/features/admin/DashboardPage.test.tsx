@@ -76,18 +76,14 @@ describe('Dashboard', () => {
 
   it('filters are read from the URL and sent to the API', async () => {
     const tracks = vi.spyOn(adminApi, 'tracks').mockResolvedValue(list([]));
-    renderApp(<AppRoutes />, ['/admin?status=hidden&sort=count_asc&q=didi&page=2']);
+    renderApp(<AppRoutes />, ['/admin?sort=count_asc&q=didi&page=2']);
     await waitFor(() =>
-      expect(tracks).toHaveBeenCalledWith(
-        expect.objectContaining({ status: 'hidden', sort: 'count_asc', q: 'didi', page: 2 }),
-      ),
+      expect(tracks).toHaveBeenCalledWith(expect.objectContaining({ sort: 'count_asc', q: 'didi', page: 2 })),
     );
     expect(await screen.findByText('Aucun morceau ne correspond à ces filtres.')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Réinitialiser les filtres' }));
     await waitFor(() =>
-      expect(tracks).toHaveBeenLastCalledWith(
-        expect.objectContaining({ status: 'all', sort: 'count_desc', page: 1 }),
-      ),
+      expect(tracks).toHaveBeenLastCalledWith(expect.objectContaining({ sort: 'count_desc', page: 1 })),
     );
   });
 
@@ -138,14 +134,30 @@ describe('Dashboard', () => {
     await waitFor(() => expect(patch).toHaveBeenCalledWith('isrc:FR9W11916593', { hidden: true }));
   });
 
-  it('US-10: export link carries the current filters', async () => {
+  it('US-10: Excel export link carries the current filters', async () => {
     vi.spyOn(adminApi, 'tracks').mockResolvedValue(list([adminTrack()]));
-    renderApp(<AppRoutes />, ['/admin?status=played&q=didi&page=3']);
-    const link = await screen.findByRole('link', { name: /Exporter CSV/ });
-    expect(link).toHaveAttribute(
-      'href',
-      '/api/admin/tracks/export.csv?q=didi&status=played&sort=count_desc&explicit=include&range=all',
-    );
+    renderApp(<AppRoutes />, ['/admin?q=didi&page=3']);
+    const link = await screen.findByRole('link', { name: /Exporter Excel/ });
+    expect(link).toHaveAttribute('href', '/api/admin/tracks/export.xlsx?q=didi&sort=count_desc&range=all');
+  });
+
+  it('no status / explicit filters and no auto-sync switch', async () => {
+    vi.spyOn(adminApi, 'tracks').mockResolvedValue(list([adminTrack()]));
+    renderApp(<AppRoutes />, ['/admin']);
+    await screen.findByRole('link', { name: /Exporter Excel/ });
+    expect(screen.queryByText('Statut')).not.toBeInTheDocument();
+    expect(screen.queryByText('Masquer explicites')).not.toBeInTheDocument();
+    expect(screen.queryByRole('switch', { name: /Synchro auto/ })).not.toBeInTheDocument();
+  });
+
+  it('hidden tracks stay listed (no rank) and can be unhidden', async () => {
+    vi.spyOn(adminApi, 'tracks').mockResolvedValue(list([adminTrack({ hidden: true })]));
+    const patch = vi.spyOn(adminApi, 'patchTrack').mockResolvedValue(adminTrack());
+    renderApp(<AppRoutes />, ['/admin']);
+    const [more] = await screen.findAllByRole('button', { name: /Plus d'actions/ });
+    fireEvent.click(more);
+    fireEvent.click(screen.getByRole('menuitem', { name: 'Réafficher' }));
+    await waitFor(() => expect(patch).toHaveBeenCalledWith('isrc:FR9W11916593', { hidden: false }));
   });
 
   it('US-11: admin can close submissions', async () => {

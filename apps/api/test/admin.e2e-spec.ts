@@ -158,25 +158,23 @@ describe('Admin dashboard API (e2e)', () => {
 
   it('tracks: default ranking with dense global rank and genre chips', async () => {
     const { body } = await get('/api/admin/tracks').expect(200);
-    expect(titles(body)).toEqual(['Party', 'Adios', '1er Gaou', 'Dai Dai']);
-    expect(body.items.map((i: { rank: number }) => i.rank)).toEqual([1, 2, 2, 3]);
-    expect(body).toMatchObject({ total: 4, page: 1, limit: 50, hasMore: false });
+    // Hidden tracks are listed too (flagged) so the admin can unhide them; rank ignores them.
+    expect(titles(body)).toEqual(['Bad', 'Party', 'Adios', '1er Gaou', 'Dai Dai']);
+    expect(body.items.map((i: { rank: number }) => i.rank).slice(1)).toEqual([1, 2, 2, 3]);
+    expect(body.items[0]).toMatchObject({ hidden: true });
+    expect(body).toMatchObject({ total: 5, page: 1, limit: 50, hasMore: false });
     expect(body.genres).toEqual([
       { name: 'Rap/Hip Hop', count: 2 },
       { name: 'Autres', count: 1 },
+      { name: 'Dance', count: 1 },
       { name: 'Musique africaine', count: 1 },
     ]);
-    expect(body.items[2]).toMatchObject({ played: true, hidden: false, addedByMe: false });
+    expect(body.items[3]).toMatchObject({ played: true, hidden: false, addedByMe: false });
   });
 
-  it('tracks: status filters', async () => {
-    expect(titles((await get('/api/admin/tracks?status=hidden').expect(200)).body)).toEqual(['Bad']);
-    expect(titles((await get('/api/admin/tracks?status=played').expect(200)).body)).toEqual(['1er Gaou']);
-    expect(titles((await get('/api/admin/tracks?status=toplay').expect(200)).body)).toEqual([
-      'Party',
-      'Adios',
-      'Dai Dai',
-    ]);
+  it('tracks: removed status/explicit params are ignored', async () => {
+    const { body } = await get('/api/admin/tracks?status=hidden&explicit=exclude').expect(200);
+    expect(body.total).toBe(5);
   });
 
   it('tracks: sorts', async () => {
@@ -184,13 +182,14 @@ describe('Admin dashboard API (e2e)', () => {
     expect(titles((await get('/api/admin/tracks?sort=alpha').expect(200)).body)).toEqual([
       '1er Gaou',
       'Adios',
+      'Bad',
       'Dai Dai',
       'Party',
     ]);
     expect(titles((await get('/api/admin/tracks?sort=recent').expect(200)).body)[0]).toBe('Adios');
   });
 
-  it('tracks: text search (escaped regex), genre, explicit, range, pagination', async () => {
+  it('tracks: text search (escaped regex), genre, range, pagination', async () => {
     expect((await get('/api/admin/tracks?q=(').expect(200)).body.total).toBe(0);
     expect(titles((await get('/api/admin/tracks?q=didi').expect(200)).body)).toEqual(['Party', 'Adios']);
     expect(titles((await get('/api/admin/tracks?q=GAOU').expect(200)).body)).toEqual(['1er Gaou']);
@@ -198,13 +197,10 @@ describe('Admin dashboard API (e2e)', () => {
     expect(
       titles((await get(`/api/admin/tracks?genre=${encodeURIComponent('Rap/Hip Hop')}`).expect(200)).body),
     ).toEqual(['Party', 'Adios']);
-    expect(titles((await get('/api/admin/tracks?explicit=exclude').expect(200)).body)).not.toContain(
-      '1er Gaou',
-    );
     expect(titles((await get('/api/admin/tracks?range=1h').expect(200)).body)).toEqual(['Party', 'Adios']);
     const p2 = (await get('/api/admin/tracks?limit=3&page=2').expect(200)).body;
-    expect(p2).toMatchObject({ total: 4, page: 2, hasMore: false });
-    expect(titles(p2)).toEqual(['Dai Dai']);
+    expect(p2).toMatchObject({ total: 5, page: 2, hasMore: false });
+    expect(titles(p2)).toEqual(['1er Gaou', 'Dai Dai']);
     await get('/api/admin/tracks?sort=nope').expect(400);
   });
 

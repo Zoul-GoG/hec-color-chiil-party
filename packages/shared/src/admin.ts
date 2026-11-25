@@ -9,15 +9,11 @@ export interface AdminTrackDto extends TrackDto {
 }
 
 export type Range = 'all' | '1h';
-export type AdminStatus = 'all' | 'toplay' | 'played' | 'hidden';
 export type AdminSort = 'count_desc' | 'count_asc' | 'recent' | 'alpha';
-export type ExplicitFilter = 'include' | 'exclude';
 
 export interface AdminTracksQuery {
   q?: string;
   genre?: string;
-  status?: AdminStatus;
-  explicit?: ExplicitFilter;
   range?: Range;
   sort?: AdminSort;
   page?: number;

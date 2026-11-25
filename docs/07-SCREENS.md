@@ -102,7 +102,7 @@ Basé sur `design-references/screenshots/admin-login-*.png`, avec corrections :
 Basé sur `design-references/screenshots/admin-dashboard-light.png`, avec corrections.
 
 ### 3.1 Header admin
-Logo + « Color & Chill · Admin » · à droite : interrupteur « Synchro auto » (icône sync qui tourne quand actif), email admin (≥ 768 px), ThemeToggle, bouton ghost « Déconnexion ».
+Logo + « Color & Chill · Admin » · à droite : email admin (≥ 768 px), ThemeToggle, bouton ghost « Déconnexion ».
 
 ### 3.2 Bannière
 Carte `rounded-xl` dégradé `#0652DD → #E02424` (identique dans les 2 thèmes, texte blanc) :
@@ -131,7 +131,7 @@ KPI en chargement : skeleton ; en erreur : carte « — » + icône d'alerte.
 ### 3.4 Classement
 Carte `surface` :
 - Titre « Classement des morceaux » + badge « {total} titres » ; sous‑titre « Trié du plus ajouté au moins ajouté. »
-- Barre d'outils : recherche (debounce 300 ms) · select **Tri** (Plus ajoutés / Moins ajoutés / Plus récents / A → Z) · select **Statut** (Tous / À jouer / Joués / Masqués) · toggle « Masquer explicites » · (P1) bouton « Exporter CSV ».
+- Barre d'outils : recherche (debounce 300 ms) · select **Tri** (Plus ajoutés / Moins ajoutés / Plus récents / A → Z) · bouton « Exporter Excel » (.xlsx). Les morceaux masqués restent dans la liste (atténués, badge « Masqué », rang « — ») pour pouvoir être réaffichés.
 - Chips genre avec compteurs : « Tous ({n}) », puis chaque genre renvoyé par l'API.
 - Lignes (desktop = tableau, mobile = cartes empilées) :
   `Rang (🥇🥈🥉 puis #n)` · pochette 48 · titre + artiste · genre · `×count` (gros, tabular) · « 1er : 21:04 · dernier : 22:31 » · ▶ extrait · actions :

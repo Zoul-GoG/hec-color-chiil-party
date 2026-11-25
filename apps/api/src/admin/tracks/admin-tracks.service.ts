@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import ExcelJS from 'exceljs';
 import { ErrorCode, type AdminSort, type AdminTrackDto, type AdminTracksResponseDto } from '@hcc/shared';
 import type { FilterQuery, Model, SortOrder } from 'mongoose';
 import { Addition } from '../../additions/addition.schema';
@@ -26,16 +27,12 @@ export class AdminTracksService {
     @InjectModel(Addition.name) private readonly additions: Model<Addition>,
   ) {}
 
-  /** Filter without the genre criterion (used for genre chips counts). */
+  /**
+   * Filter without the genre criterion (used for genre chips counts).
+   * Hidden tracks are listed too (flagged), so the admin can always unhide them.
+   */
   private async baseFilter(q: AdminTracksQueryDto): Promise<FilterQuery<Track>> {
     const filter: FilterQuery<Track> = {};
-    if (q.status === 'hidden') filter.hidden = true;
-    else {
-      filter.hidden = false;
-      if (q.status === 'toplay') filter.played = false;
-      if (q.status === 'played') filter.played = true;
-    }
-    if (q.explicit === 'exclude') filter.explicit = false;
     if (q.q) {
       const re = new RegExp(escapeRegex(q.q), 'i');
       filter.$or = [{ title: re }, { artistName: re }];
@@ -84,44 +81,51 @@ export class AdminTracksService {
     };
   }
 
-  /** US-10: same filters as the list, no pagination (docs/03 §4). */
-  async exportCsv(q: AdminTracksQueryDto): Promise<string> {
-    const filter = await this.baseFilter(q);
+  /** US-10: Excel export of the ranking — same filters as the list, no pagination, hidden tracks excluded. */
+  async exportXlsx(q: AdminTracksQueryDto): Promise<Buffer> {
+    const filter: FilterQuery<Track> = { ...(await this.baseFilter(q)), hidden: false };
     if (q.genre) filter.genre = q.genre === OTHER_GENRE ? null : q.genre;
     const [docs, rankCounts] = await Promise.all([
       this.tracks.find(filter).collation({ locale: 'fr', strength: 1 }).sort(SORTS[q.sort]).lean(),
       this.rankCounts(),
     ]);
-    const header = [
-      'rang',
-      'titre',
-      'artiste',
-      'album',
-      'genre',
-      'ajouts',
-      'premier_ajout',
-      'dernier_ajout',
-      'joue',
-      'lien_deezer',
+
+    const wb = new ExcelJS.Workbook();
+    wb.creator = 'HEC Color & Chill Party';
+    wb.created = new Date();
+    const ws = wb.addWorksheet('Classement', { views: [{ state: 'frozen', ySplit: 1 }] });
+    ws.columns = [
+      { header: 'Rang', key: 'rank', width: 7 },
+      { header: 'Titre', key: 'title', width: 40 },
+      { header: 'Artiste', key: 'artist', width: 28 },
+      { header: 'Album', key: 'album', width: 32 },
+      { header: 'Genre', key: 'genre', width: 20 },
+      { header: 'Ajouts', key: 'count', width: 9 },
+      { header: 'Premier ajout', key: 'first', width: 17, style: { numFmt: 'dd/mm/yyyy hh:mm' } },
+      { header: 'Dernier ajout', key: 'last', width: 17, style: { numFmt: 'dd/mm/yyyy hh:mm' } },
+      { header: 'Joué', key: 'played', width: 7 },
+      { header: 'Lien Deezer', key: 'link', width: 38 },
     ];
-    const lines = docs.map((t) =>
-      [
-        rankOf(t.addCount, rankCounts),
-        t.title,
-        t.artistName,
-        t.albumTitle,
-        t.genre ?? OTHER_GENRE,
-        t.addCount,
-        csvDate(t.firstAddedAt),
-        csvDate(t.lastAddedAt),
-        t.played ? 'oui' : 'non',
-        t.deezerLink,
-      ]
-        .map(csvCell)
-        .join(';'),
-    );
-    // BOM so Excel opens UTF-8 correctly; CRLF line endings.
-    return '\uFEFF' + [header.join(';'), ...lines].join('\r\n') + '\r\n';
+    // Cells are written as plain values (never formulas), so there is no formula-injection risk.
+    for (const t of docs) {
+      ws.addRow({
+        rank: rankOf(t.addCount, rankCounts),
+        title: t.title,
+        artist: t.artistName,
+        album: t.albumTitle,
+        genre: t.genre ?? OTHER_GENRE,
+        count: t.addCount,
+        first: new Date(t.firstAddedAt),
+        last: new Date(t.lastAddedAt),
+        played: t.played ? 'oui' : 'non',
+        link: t.deezerLink ? { text: t.deezerLink, hyperlink: t.deezerLink } : '',
+      });
+    }
+    const header = ws.getRow(1);
+    header.font = { bold: true };
+    header.alignment = { vertical: 'middle' };
+    ws.autoFilter = { from: 'A1', to: 'J1' };
+    return Buffer.from(await wb.xlsx.writeBuffer());
   }
 
   async patch(trackKey: string, body: AdminTrackPatchBodyDto): Promise<AdminTrackDto> {
@@ -141,18 +145,6 @@ export class AdminTracksService {
     const counts = await this.tracks.distinct('addCount', { hidden: false });
     return (counts as number[]).sort((a, b) => b - a);
   }
-}
-
-/** `2026-11-27 21:04` (UTC = Abidjan time). */
-function csvDate(d: Date): string {
-  return new Date(d).toISOString().slice(0, 16).replace('T', ' ');
-}
-
-/** Quotes when needed and neutralises spreadsheet formulas (CSV injection). */
-export function csvCell(value: string | number): string {
-  let s = String(value ?? '');
-  if (typeof value === 'string' && /^[=+\-@\t\r]/.test(s)) s = `'${s}`;
-  return /[;"\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
 }
 
 /** Dense rank: 1 + number of distinct visible counts strictly greater. */

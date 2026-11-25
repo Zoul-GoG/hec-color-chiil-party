@@ -41,7 +41,10 @@ export function Logo({
       >
         {fr.brand.name}
         {suffix ? (
-          <span className={cn('font-semibold max-sm:hidden', onDark ? 'text-white/80' : 'text-fg-muted')}> · {suffix}</span>
+          <span className={cn('font-semibold max-sm:hidden', onDark ? 'text-white/80' : 'text-fg-muted')}>
+            {' '}
+            · {suffix}
+          </span>
         ) : null}
       </span>
     </Link>

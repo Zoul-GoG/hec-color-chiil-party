@@ -144,21 +144,21 @@ Paramètres (tous optionnels) :
 |---|---|---|
 | `q` | texte (titre ou artiste, insensible à la casse, regex **échappée**) | — |
 | `genre` | nom de genre exact | — |
-| `status` | `all` `toplay` `played` `hidden` | `all` — `all` = tous les **non masqués** ; `toplay` = non masqués et non joués ; `played` = non masqués et joués ; `hidden` = masqués uniquement |
-| `explicit` | `include` `exclude` | `include` |
 | `range` | `all` `1h` (morceaux ayant ≥1 ajout dans l'heure ; compteur reste global) | `all` |
 | `sort` | `count_desc` `count_asc` `recent` `alpha` | `count_desc` |
 | `page`, `limit` | ≥1, 1..100 | 1, 50 |
 
+La liste contient **tous** les morceaux, masqués compris (`hidden: true`), pour permettre de les réafficher. Les paramètres `status` / `explicit` ont été retirés (ignorés s'ils sont envoyés).
 `200 Paginated<AdminTrackDto>` + champ `genres: { name: string; count: number }[]` (pour construire les chips de filtre avec compteurs).
 `rank` = position dans le classement **global** par `addCount` desc (égalité → même rang), indépendant des filtres.
 
 ### `PATCH /api/admin/tracks/:trackKey`
 Corps : `{ "played"?: boolean, "hidden"?: boolean }` → `200 AdminTrackDto`. `played:true` fixe `playedAt=now`.
 
-### `GET /api/admin/tracks/export.csv` (P1)
-Mêmes filtres que la liste, sans pagination. `text/csv; charset=utf-8` avec BOM (Excel). Colonnes :
-`rang;titre;artiste;album;genre;ajouts;premier_ajout;dernier_ajout;joue;lien_deezer`. Séparateur `;`.
+### `GET /api/admin/tracks/export.xlsx` (P1)
+Mêmes filtres que la liste, sans pagination, **morceaux masqués exclus**.
+`application/vnd.openxmlformats-officedocument.spreadsheetml.sheet`, feuille « Classement », en-tête figé + filtres automatiques. Colonnes :
+`Rang | Titre | Artiste | Album | Genre | Ajouts | Premier ajout | Dernier ajout | Joué | Lien Deezer` (dates Excel natives, lien cliquable).
 
 ### `PATCH /api/admin/settings` (P1)
 Corps `{ "submissionsOpen": boolean }` → `200 { "submissionsOpen": boolean }`.

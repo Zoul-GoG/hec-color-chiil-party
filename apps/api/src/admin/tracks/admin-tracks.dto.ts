@@ -1,6 +1,6 @@
 import { Transform, Type } from 'class-transformer';
 import { IsBoolean, IsIn, IsInt, IsOptional, IsString, Max, MaxLength, Min } from 'class-validator';
-import type { AdminSort, AdminStatus, ExplicitFilter, Range } from '@hcc/shared';
+import type { AdminSort, Range } from '@hcc/shared';
 
 const trim = ({ value }: { value: unknown }) => (typeof value === 'string' ? value.trim() : value);
 
@@ -22,14 +22,6 @@ export class AdminTracksQueryDto extends RangeQueryDto {
   @IsString()
   @MaxLength(80)
   genre?: string;
-
-  @IsOptional()
-  @IsIn(['all', 'toplay', 'played', 'hidden'])
-  status: AdminStatus = 'all';
-
-  @IsOptional()
-  @IsIn(['include', 'exclude'])
-  explicit: ExplicitFilter = 'include';
 
   @IsOptional()
   @IsIn(['count_desc', 'count_asc', 'recent', 'alpha'])

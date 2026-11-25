@@ -1,4 +1,4 @@
-import type { AdminSort, AdminStatus, AdminTrackDto } from '@hcc/shared';
+import type { AdminSort, AdminTrackDto } from '@hcc/shared';
 import {
   AlertTriangle,
   Check,
@@ -32,24 +32,17 @@ interface Props {
   filters: DashboardFilters;
   update: (patch: Partial<DashboardFilters>) => void;
   reset: () => void;
-  autoSync: boolean;
 }
 
 /** US-8: filterable ranking (docs/07 §3.4). */
-export function TracksPanel({ filters, update, reset, autoSync }: Props) {
-  const q = useAdminTracks(filters, autoSync);
+export function TracksPanel({ filters, update, reset }: Props) {
+  const q = useAdminTracks(filters);
   const patch = usePatchTrack();
   const [confirmKey, setConfirmKey] = useState<string | null>(null);
   const data = q.data;
   const pages = data ? Math.max(1, Math.ceil(data.total / data.limit)) : 1;
   const allCount = data?.genres.reduce((s, g) => s + g.count, 0) ?? 0;
-  const hasFilters = Boolean(
-    filters.q ||
-    filters.genre ||
-    filters.status !== 'all' ||
-    filters.explicit === 'exclude' ||
-    filters.range === '1h',
-  );
+  const hasFilters = Boolean(filters.q || filters.genre || filters.range === '1h');
 
   const actions: RowActions = {
     togglePlayed: (t) => patch.mutate({ trackKey: t.trackKey, patch: { played: !t.played } }),
@@ -256,36 +249,12 @@ function Toolbar({ filters, update }: Pick<Props, 'filters' | 'update'>) {
             ))}
           </select>
         </label>
-        <label className="flex items-center gap-2 text-sm text-fg-muted">
-          {d.statusLabel}
-          <select
-            className={selectCls}
-            value={filters.status}
-            onChange={(e) => update({ status: e.target.value as AdminStatus })}
-          >
-            {(Object.keys(d.statuses) as AdminStatus[]).map((k) => (
-              <option key={k} value={k}>
-                {d.statuses[k]}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="flex h-10 cursor-pointer items-center gap-2 text-sm text-fg">
-          <input
-            type="checkbox"
-            role="switch"
-            checked={filters.explicit === 'exclude'}
-            onChange={(e) => update({ explicit: e.target.checked ? 'exclude' : 'include' })}
-            className="size-4 cursor-pointer accent-brand-blue"
-          />
-          {d.hideExplicit}
-        </label>
         <a
           href={exportUrl(filters)}
           download
           className="inline-flex h-10 items-center gap-2 rounded-md border border-border bg-surface-2 px-3 text-sm font-semibold text-fg hover:bg-surface-3"
         >
-          <Download className="size-4" aria-hidden /> {d.exportCsv}
+          <Download className="size-4" aria-hidden /> {d.exportExcel}
         </a>
       </div>
     </div>
@@ -296,7 +265,7 @@ function exportUrl(f: DashboardFilters): string {
   const { page: _page, limit: _limit, ...q } = toQuery(f);
   const params = new URLSearchParams();
   for (const [k, v] of Object.entries(q)) if (v !== undefined && v !== '') params.set(k, String(v));
-  return `/api/admin/tracks/export.csv?${params.toString()}`;
+  return `/api/admin/tracks/export.xlsx?${params.toString()}`;
 }
 
 interface RowActions {
@@ -307,7 +276,8 @@ interface RowActions {
   unhide: (t: AdminTrackDto) => void;
 }
 
-function Rank({ rank }: { rank: number }) {
+function Rank({ rank, hidden }: { rank: number; hidden: boolean }) {
+  if (hidden) return <span className="font-display font-bold text-fg-subtle">—</span>;
   return rank <= 3 ? (
     <span role="img" aria-label={fr.track.rankAria(rank)} className="text-xl">
       {MEDALS[rank - 1]}
@@ -456,7 +426,7 @@ function TableRow({
       )}
     >
       <td className="py-3 pr-3 pl-6">
-        <Rank rank={t.rank} />
+        <Rank rank={t.rank} hidden={t.hidden} />
       </td>
       <td className="w-full max-w-0 py-3 pr-4">
         <TrackInfo t={t} />
@@ -495,7 +465,7 @@ function MobileRow({
     <li className={cn('flex flex-col gap-3 px-4 py-3', (t.played || t.hidden) && 'opacity-60')}>
       <div className="flex items-center gap-3">
         <div className="w-9 shrink-0 text-center">
-          <Rank rank={t.rank} />
+          <Rank rank={t.rank} hidden={t.hidden} />
         </div>
         <div className="min-w-0 flex-1">
           <TrackInfo t={t} />

@@ -1,10 +1,8 @@
 import type {
   AdminSort,
-  AdminStatus,
   AdminTrackPatchDto,
   AdminTracksQuery,
   AdminTracksResponseDto,
-  ExplicitFilter,
   Range,
 } from '@hcc/shared';
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -18,28 +16,23 @@ import { adminApi } from '../lib/api';
 export interface DashboardFilters {
   q: string;
   genre: string;
-  status: AdminStatus;
   sort: AdminSort;
-  explicit: ExplicitFilter;
   range: Range;
   page: number;
 }
 
-const STATUSES: AdminStatus[] = ['all', 'toplay', 'played', 'hidden'];
 const SORTS: AdminSort[] = ['count_desc', 'count_asc', 'recent', 'alpha'];
 const pick = <T extends string>(v: string | null, allowed: T[], fallback: T): T =>
   v && (allowed as string[]).includes(v) ? (v as T) : fallback;
 
-/** Filters live in the URL (?q=&genre=&status=&sort=&page=…) so a refresh keeps them (docs/07 §3.4). */
+/** Filters live in the URL (?q=&genre=&sort=&range=&page=…) so a refresh keeps them (docs/07 §3.4). */
 export function useDashboardFilters() {
   const [params, setParams] = useSearchParams();
   const filters = useMemo<DashboardFilters>(
     () => ({
       q: params.get('q') ?? '',
       genre: params.get('genre') ?? '',
-      status: pick(params.get('status'), STATUSES, 'all'),
       sort: pick(params.get('sort'), SORTS, 'count_desc'),
-      explicit: params.get('explicit') === 'exclude' ? 'exclude' : 'include',
       range: params.get('range') === '1h' ? '1h' : 'all',
       page: Math.max(1, Number(params.get('page')) || 1),
     }),
@@ -52,13 +45,14 @@ export function useDashboardFilters() {
         (prev) => {
           const next = new URLSearchParams(prev);
           const merged = { ...Object.fromEntries(prev), ...patch } as Record<string, unknown>;
+          // Drop legacy params (removed status / explicit filters) from old bookmarked URLs.
+          next.delete('status');
+          next.delete('explicit');
           if (!('page' in patch)) merged.page = 1;
           const defaults: Record<string, unknown> = {
             q: '',
             genre: '',
-            status: 'all',
             sort: 'count_desc',
-            explicit: 'include',
             range: 'all',
             page: 1,
           };
@@ -90,11 +84,12 @@ export function useDashboardFilters() {
   return { filters, update, reset };
 }
 
-export function useStats(range: Range, autoSync: boolean) {
+/** US-9: the dashboard always refreshes every 15 s while the tab is visible. */
+export function useStats(range: Range) {
   return useQuery({
     queryKey: ['admin', 'stats', range],
     queryFn: () => adminApi.stats(range),
-    refetchInterval: autoSync ? POLL_INTERVAL_MS : false,
+    refetchInterval: POLL_INTERVAL_MS,
     refetchIntervalInBackground: false,
   });
 }
@@ -103,22 +98,20 @@ export function toQuery(f: DashboardFilters): AdminTracksQuery {
   return {
     q: f.q || undefined,
     genre: f.genre || undefined,
-    status: f.status,
     sort: f.sort,
-    explicit: f.explicit,
     range: f.range,
     page: f.page,
     limit: ADMIN_PAGE_SIZE,
   };
 }
 
-export function useAdminTracks(f: DashboardFilters, autoSync: boolean) {
+export function useAdminTracks(f: DashboardFilters) {
   const query = toQuery(f);
   return useQuery({
     queryKey: ['admin', 'tracks', query],
     queryFn: () => adminApi.tracks(query),
     placeholderData: keepPreviousData,
-    refetchInterval: autoSync ? POLL_INTERVAL_MS : false,
+    refetchInterval: POLL_INTERVAL_MS,
     refetchIntervalInBackground: false,
   });
 }

@@ -1,4 +1,15 @@
-import { Body, Controller, Get, Header, Param, Patch, Query, Res, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Header,
+  Param,
+  Patch,
+  Query,
+  Res,
+  StreamableFile,
+  UseGuards,
+} from '@nestjs/common';
 import type { Response } from 'express';
 import type { AdminTrackDto, AdminTracksResponseDto, StatsDto } from '@hcc/shared';
 import { JwtCookieGuard } from './auth/jwt-cookie.guard';
@@ -20,16 +31,16 @@ export class AdminController {
   }
 
   // Declared before `tracks/:trackKey`-style routes; GET has none, but keep it first for clarity.
-  @Get('tracks/export.csv')
-  @Header('Content-Type', 'text/csv; charset=utf-8')
+  @Get('tracks/export.xlsx')
+  @Header('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
   @Header('Cache-Control', 'no-store')
-  async exportCsv(
+  async exportXlsx(
     @Query() q: AdminTracksQueryDto,
     @Res({ passthrough: true }) res: Response,
-  ): Promise<string> {
+  ): Promise<StreamableFile> {
     const stamp = new Date().toISOString().slice(0, 16).replace(/[-:T]/g, '');
-    res.setHeader('Content-Disposition', `attachment; filename="color-chill-classement-${stamp}.csv"`);
-    return this.tracks.exportCsv(q);
+    res.setHeader('Content-Disposition', `attachment; filename="color-chill-classement-${stamp}.xlsx"`);
+    return new StreamableFile(await this.tracks.exportXlsx(q));
   }
 
   @Get('tracks')

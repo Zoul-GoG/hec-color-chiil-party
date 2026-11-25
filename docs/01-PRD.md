@@ -60,14 +60,14 @@
   - Artiste le plus demandé · Répartition par genre (barre empilée, top 4 + « Autres »)
   - Graphique « Ajouts par tranche de 15 min » (barres) sur la période
 - **US-8 Classement** : tableau trié par défaut du plus ajouté au moins ajouté : rang (médailles top 3), pochette, titre, artiste, genre, compteur, premier/dernier ajout, extrait ▶, actions.
-  - Filtres : recherche texte (titre/artiste), genre (chips), statut (Tous / À jouer / Joués / Masqués), explicite (tous / masquer explicites), période (toute la soirée / dernière heure).
+  - Filtres : recherche texte (titre/artiste), genre (chips), période (toute la soirée / dernière heure).
   - Tris : plus ajoutés, moins ajoutés, plus récents, A→Z.
   - Pagination 50.
   - Actions par ligne : **Marquer joué / non joué**, **Masquer / Réafficher** (un morceau masqué disparaît de la liste publique et ne peut plus être ajouté).
-- **US-9 Synchro auto** : le dashboard se rafraîchit toutes les 15 s (interrupteur « Synchro auto » on/off).
+- **US-9 Synchro auto** : le dashboard se rafraîchit toutes les 15 s, en permanence (interrupteur retiré le 25/11).
 
 ### P1 — si le temps le permet (après tous les P0)
-- **US-10 Export CSV** du classement filtré (pour le DJ).
+- **US-10 Export Excel (.xlsx)** du classement filtré (pour le DJ), sans les morceaux masqués.
 - **US-11 Ouvrir/fermer les propositions** (interrupteur admin). Fermé → page invité en lecture seule avec bandeau « Les propositions sont closes, place à la fête ! ».
 - **US-12 Mini-lecteur collant** en bas d'écran mobile quand un extrait joue (titre + pause + progression).
 - **US-13 Raccourci ⌘K / Ctrl+K** pour focaliser la recherche (desktop).
@@ -90,7 +90,7 @@ Comptes invités, pseudo, commentaires, votes négatifs, lecture complète des m
 | R2 | Un même invité ne compte qu'une fois par morceau. |
 | R3 | Seul un morceau trouvé chez Deezer peut être ajouté (pas de saisie libre). |
 | R4 | Un morceau masqué : invisible côté public, ajout refusé (`TRACK_HIDDEN`), compteur conservé côté admin. |
-| R5 | Les explicites sont autorisés (badge « E ») ; l'admin peut les filtrer/masquer. |
+| R5 | Les explicites sont autorisés (badge « E ») ; l'admin peut les masquer un par un. |
 | R6 | ~~Max 20 ajouts / invité / 10 min~~ — **retiré** (25/11) : pas de plafond par invité ; seule la limite large par IP (300 / 10 min) subsiste. |
 
 ## 7. Exigences non fonctionnelles
