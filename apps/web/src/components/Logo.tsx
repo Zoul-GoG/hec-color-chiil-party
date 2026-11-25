@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { fr } from '../i18n/fr';
+import { txt } from '../i18n';
 import { cn } from './ui/cn';
 
 /** HEC Abidjan logo (first, main) + BDE logo + separator + "Color & Chill" (docs/06 §7). */
@@ -19,14 +19,14 @@ export function Logo({
       >
         <img
           src="/hec-abidjan-logo.png"
-          alt={fr.brand.logoAlt}
+          alt={txt.brand.logoAlt}
           className="h-8 w-auto"
           width={49}
           height={32}
         />
         <img
           src="/bde-hec-abidjan-logo.png"
-          alt={fr.brand.bdeLogoAlt}
+          alt={txt.brand.bdeLogoAlt}
           className="h-8 w-auto"
           width={28}
           height={32}
@@ -39,7 +39,7 @@ export function Logo({
           onDark ? 'text-white' : 'text-fg',
         )}
       >
-        {fr.brand.name}
+        {txt.brand.name}
         {suffix ? (
           <span className={cn('font-semibold max-sm:hidden', onDark ? 'text-white/80' : 'text-fg-muted')}>
             {' '}

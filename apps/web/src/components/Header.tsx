@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { Logo } from './Logo';
+import { LangToggle } from './LangToggle';
 import { ThemeToggle } from './ThemeToggle';
 
 export function Header({ suffix, right }: { suffix?: string; right?: ReactNode }) {
@@ -9,6 +10,7 @@ export function Header({ suffix, right }: { suffix?: string; right?: ReactNode }
         <Logo suffix={suffix} />
         <div className="flex shrink-0 items-center gap-2">
           {right}
+          <LangToggle />
           <ThemeToggle />
         </div>
       </div>

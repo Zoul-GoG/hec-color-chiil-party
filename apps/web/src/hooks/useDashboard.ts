@@ -10,7 +10,7 @@ import { useCallback, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { ADMIN_PAGE_SIZE, POLL_INTERVAL_MS } from '../config';
-import { fr } from '../i18n/fr';
+import { txt } from '../i18n';
 import { adminApi } from '../lib/api';
 
 export interface DashboardFilters {
@@ -150,7 +150,7 @@ export function usePatchTrack() {
     },
     onError: (_e, _v, ctx) => {
       ctx?.snapshot.forEach(([key, data]) => qc.setQueryData(key, data));
-      toast.error(fr.dashboard.actionError);
+      toast.error(txt.dashboard.actionError);
     },
     onSettled: () => {
       void qc.invalidateQueries({ queryKey: ['admin'] });

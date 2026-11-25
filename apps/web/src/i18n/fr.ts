@@ -19,6 +19,10 @@ export const fr = {
     toDark: 'Activer le mode sombre',
     toLight: 'Activer le mode clair',
   },
+  lang: {
+    switchTo: 'Switch to English',
+    short: 'EN',
+  },
   hero: {
     date: 'VENDREDI 27 NOV. · HEC ABIDJAN',
     open: 'Playlist ouverte',
@@ -34,7 +38,18 @@ export const fr = {
     placeholder: 'Un titre, un artiste… (ex. Didi B, Himra, Burna Boy, ...)',
     clear: 'Effacer la recherche',
     ideas: 'Idées :',
-    ideaChips: ['Didi B', 'Suspect 95', 'Himra', 'Wantché', 'Tiakola', 'Dopelym', 'Drake', 'Leto'],
+    ideaChips: [
+      'Didi B',
+      'Suspect 95',
+      'Himra',
+      'Wantché',
+      'Tiakola',
+      'Dopelym',
+      'Drake',
+      'Leto',
+      'Asake',
+      'Gims',
+    ],
     // ideaChips: ['Coupé-Décalé', 'Afrobeats', 'Amapiano', 'Rap Ivoire', 'Zouglou', 'Afro House'],
     //resultsHeader: 'RÉSULTATS DEEZER',
     resultsHeader: 'RÉSULTATS...',
@@ -69,6 +84,7 @@ export const fr = {
   closed: {
     banner: 'Les propositions sont closes, place à la fête !',
     admin: 'Propositions',
+    adminLabel: 'Propositions :',
     open: 'Ouvertes',
     closed: 'Closes',
     openedToast: 'Propositions ouvertes 🎶',
@@ -147,10 +163,13 @@ export const fr = {
     topArtist: 'Artiste le plus demandé',
     topArtistCount: (n: number) => `${n} ${plural(n, 'ajout', 'ajouts')}`,
     genres: 'Genres',
+    /** Display label of the backend's catch-all genre bucket ('Autres'). */
+    otherGenre: 'Autres',
     noData: 'Pas encore de données.',
     chartTitle: 'Ajouts par 15 min',
     chartTitle30: 'Ajouts par 30 min',
     chartTooltip: (n: number) => `${n} ${plural(n, 'ajout', 'ajouts')}`,
+    chartBarAria: (time: string, n: number) => `${time} : ${n} ${plural(n, 'ajout', 'ajouts')}`,
     chartTableCaption: 'Ajouts par tranche horaire',
     chartColTime: 'Tranche',
     chartColCount: 'Ajouts',
@@ -208,3 +227,14 @@ export const fr = {
     INTERNAL_ERROR: 'Oups, une erreur est survenue.',
   } satisfies Record<ErrorCode, string>,
 } as const;
+
+/** Deeply widens literal types so other languages only have to match the shape. */
+type Widen<T> = T extends string
+  ? string
+  : T extends (...args: infer A) => infer R
+    ? (...args: A) => Widen<R>
+    : T extends readonly (infer U)[]
+      ? readonly Widen<U>[]
+      : { [K in keyof T]: Widen<T[K]> };
+
+export type Messages = Widen<typeof fr>;

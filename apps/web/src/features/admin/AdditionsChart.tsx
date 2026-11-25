@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Card } from '../../components/ui/Card';
 import { cn } from '../../components/ui/cn';
 import { Skeleton } from '../../components/ui/Skeleton';
-import { fr } from '../../i18n/fr';
+import { txt } from '../../i18n';
 import { formatTime } from '../../lib/format';
 
 const PLOT_H = 160;
@@ -20,7 +20,7 @@ export function AdditionsChart({ stats, loading }: { stats?: StatsDto; loading: 
     data.length > 1
       ? new Date(data[1].bucketStart).getTime() - new Date(data[0].bucketStart).getTime()
       : 15 * 60_000;
-  const title = bin > 15 * 60_000 ? fr.dashboard.chartTitle30 : fr.dashboard.chartTitle;
+  const title = bin > 15 * 60_000 ? txt.dashboard.chartTitle30 : txt.dashboard.chartTitle;
   const labelEvery = Math.max(1, Math.ceil(data.length / 8));
 
   return (
@@ -32,7 +32,7 @@ export function AdditionsChart({ stats, loading }: { stats?: StatsDto; loading: 
       {loading ? (
         <Skeleton className="mt-4 h-40 w-full" />
       ) : data.length === 0 ? (
-        <p className="mt-4 text-sm text-fg-muted">{fr.dashboard.noData}</p>
+        <p className="mt-4 text-sm text-fg-muted">{txt.dashboard.noData}</p>
       ) : (
         <>
           <div className="relative mt-4" onMouseLeave={() => setActive(null)}>
@@ -49,7 +49,7 @@ export function AdditionsChart({ stats, loading }: { stats?: StatsDto; loading: 
                   <div
                     key={d.bucketStart}
                     tabIndex={0}
-                    aria-label={`${formatTime(d.bucketStart)} : ${fr.dashboard.chartTooltip(d.count)}`}
+                    aria-label={txt.dashboard.chartBarAria(formatTime(d.bucketStart), d.count)}
                     onMouseEnter={() => setActive(i)}
                     onFocus={() => setActive(i)}
                     onBlur={() => setActive(null)}
@@ -73,7 +73,7 @@ export function AdditionsChart({ stats, loading }: { stats?: StatsDto; loading: 
                         style={{ bottom: Math.min(h + 8, PLOT_H - 32) }}
                       >
                         <span className="text-fg-muted">{formatTime(d.bucketStart)}</span>{' '}
-                        <span className="tabular font-semibold">{fr.dashboard.chartTooltip(d.count)}</span>
+                        <span className="tabular font-semibold">{txt.dashboard.chartTooltip(d.count)}</span>
                       </div>
                     ) : null}
                   </div>
@@ -94,11 +94,11 @@ export function AdditionsChart({ stats, loading }: { stats?: StatsDto; loading: 
           {/* sr-only on a wrapper: Firefox renders a <caption> outside a clipped <table>. */}
           <div className="sr-only">
             <table>
-              <caption>{fr.dashboard.chartTableCaption}</caption>
+              <caption>{txt.dashboard.chartTableCaption}</caption>
               <thead>
                 <tr>
-                  <th>{fr.dashboard.chartColTime}</th>
-                  <th>{fr.dashboard.chartColCount}</th>
+                  <th>{txt.dashboard.chartColTime}</th>
+                  <th>{txt.dashboard.chartColCount}</th>
                 </tr>
               </thead>
               <tbody>

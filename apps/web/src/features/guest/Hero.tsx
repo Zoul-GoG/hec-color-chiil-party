@@ -1,4 +1,4 @@
-import { fr } from '../../i18n/fr';
+import { txt } from '../../i18n';
 
 export function Hero({ open = true }: { open?: boolean }) {
   return (
@@ -12,24 +12,24 @@ export function Hero({ open = true }: { open?: boolean }) {
             className={`relative inline-flex size-2 rounded-full ${open ? 'bg-brand-red' : 'bg-fg-subtle'}`}
           />
         </span>
-        <span className="whitespace-nowrap">{fr.hero.date}</span>
+        <span className="whitespace-nowrap">{txt.hero.date}</span>
         <span aria-hidden className="hidden text-fg-subtle min-[400px]:inline">
           ·
         </span>
         <span
           className={`whitespace-nowrap normal-case tracking-normal ${open ? 'text-brand-red-text' : 'text-fg-muted'}`}
         >
-          {open ? fr.hero.open : fr.hero.closed}
+          {open ? txt.hero.open : txt.hero.closed}
         </span>
       </p>
       <h1 className="mt-5 max-w-3xl font-display text-[30px] leading-9 font-extrabold tracking-[-0.02em] text-fg sm:text-[40px] sm:leading-[48px]">
-        {fr.hero.titleBefore}
-        <span className="text-gradient-color">{fr.hero.titleColor}</span>
+        {txt.hero.titleBefore}
+        <span className="text-gradient-color">{txt.hero.titleColor}</span>
         <span className="whitespace-nowrap">
-          {fr.hero.titleAfter} <span aria-hidden>🎶</span>
+          {txt.hero.titleAfter} <span aria-hidden>🎶</span>
         </span>
       </h1>
-      <p className="mt-3 max-w-2xl text-base leading-6 text-fg-muted">{fr.hero.subtitle}</p>
+      <p className="mt-3 max-w-2xl text-base leading-6 text-fg-muted">{txt.hero.subtitle}</p>
     </section>
   );
 }

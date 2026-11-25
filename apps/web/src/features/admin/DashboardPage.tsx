@@ -1,6 +1,6 @@
 import { useDashboardFilters, useStats } from '../../hooks/useDashboard';
 import { useDocumentTitle } from '../../hooks/useDocumentTitle';
-import { fr } from '../../i18n/fr';
+import { txt } from '../../i18n';
 import { AdditionsChart } from './AdditionsChart';
 import { AdminHeader } from './AdminHeader';
 import { DashboardBanner } from './DashboardBanner';
@@ -9,7 +9,7 @@ import { TracksPanel } from './TracksPanel';
 
 /** /admin (docs/07 §3): banner, KPIs, chart, ranking. */
 export function DashboardPage() {
-  useDocumentTitle(fr.titles.dashboard);
+  useDocumentTitle(txt.titles.dashboard);
   const { filters, update, reset } = useDashboardFilters();
   const stats = useStats(filters.range);
 

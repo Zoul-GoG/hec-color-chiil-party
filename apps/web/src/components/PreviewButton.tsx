@@ -1,6 +1,6 @@
 import { Pause, Play } from 'lucide-react';
 import { useAudioPreview, type PreviewSource } from '../audio/AudioPreviewProvider';
-import { fr } from '../i18n/fr';
+import { txt } from '../i18n';
 import { cn } from './ui/cn';
 import { Spinner } from './ui/Spinner';
 
@@ -25,13 +25,17 @@ export function PreviewButton({
   const { state, toggle } = useAudioPreview();
   const current = state.currentKey === trackKey;
   const playing = current && (state.status === 'playing' || state.status === 'loading');
-  const ariaLabel = !available ? fr.track.noPreview : playing ? fr.track.pauseAria : fr.track.playAria(title);
+  const ariaLabel = !available
+    ? txt.track.noPreview
+    : playing
+      ? txt.track.pauseAria
+      : txt.track.playAria(title);
   return (
     <button
       type="button"
       disabled={!available}
       aria-label={ariaLabel}
-      title={!available ? fr.track.noPreview : undefined}
+      title={!available ? txt.track.noPreview : undefined}
       aria-pressed={playing}
       onClick={() => toggle(trackKey, source())}
       className={cn(

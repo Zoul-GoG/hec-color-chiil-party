@@ -2,7 +2,7 @@ import type { Range } from '@hcc/shared';
 import { cn } from '../../components/ui/cn';
 import { useSubmissionsOpen, useToggleSubmissions } from '../../hooks/useSettings';
 import { useNow } from '../../hooks/useNow';
-import { fr } from '../../i18n/fr';
+import { txt } from '../../i18n';
 
 export function DashboardBanner({
   range,
@@ -24,21 +24,21 @@ export function DashboardBanner({
           <div className="flex flex-wrap gap-2 text-[11px] leading-[14px] font-bold tracking-[0.06em]">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-2.5 py-1">
               <span aria-hidden className="size-2 animate-pulse rounded-full bg-white" />
-              {fr.dashboard.live}
+              {txt.dashboard.live}
             </span>
             <span className="inline-flex items-center rounded-full bg-white/20 px-2.5 py-1">
-              {fr.dashboard.place}
+              {txt.dashboard.place}
             </span>
           </div>
           <h1 className="mt-3 font-display text-[26px] leading-8 font-bold sm:text-[32px] sm:leading-10">
-            {fr.dashboard.title}
+            {txt.dashboard.title}
           </h1>
-          <p className="mt-1 text-sm text-white/85 sm:text-base">{fr.dashboard.subtitle}</p>
+          <p className="mt-1 text-sm text-white/85 sm:text-base">{txt.dashboard.subtitle}</p>
         </div>
         <div className="flex flex-col items-start gap-2 lg:items-end">
           <div
             role="radiogroup"
-            aria-label={fr.dashboard.periodLabel}
+            aria-label={txt.dashboard.periodLabel}
             className="inline-flex rounded-full bg-white/15 p-1"
           >
             {(['all', '1h'] as const).map((r) => (
@@ -53,7 +53,7 @@ export function DashboardBanner({
                   range === r ? 'bg-white text-brand-blue shadow-card' : 'text-white hover:bg-white/10',
                 )}
               >
-                {r === 'all' ? fr.dashboard.rangeAll : fr.dashboard.range1h}
+                {r === 'all' ? txt.dashboard.rangeAll : txt.dashboard.range1h}
               </button>
             ))}
           </div>
@@ -65,7 +65,7 @@ export function DashboardBanner({
             onClick={() => toggle.mutate(!open)}
             className="inline-flex h-9 cursor-pointer items-center gap-2 rounded-full bg-white/15 px-3 text-sm font-semibold text-white hover:bg-white/25 disabled:opacity-60"
           >
-            {fr.closed.admin} :
+            {txt.closed.adminLabel}
             <span
               aria-hidden
               className={cn(
@@ -80,11 +80,11 @@ export function DashboardBanner({
                 )}
               />
             </span>
-            {open ? fr.closed.open : fr.closed.closed}
+            {open ? txt.closed.open : txt.closed.closed}
           </button>
           {ago !== null ? (
             <p className="tabular text-xs text-white/80" aria-live="off">
-              {fr.dashboard.updated(ago)}
+              {txt.dashboard.updated(ago)}
             </p>
           ) : null}
         </div>

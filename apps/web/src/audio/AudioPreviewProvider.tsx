@@ -9,7 +9,7 @@ import {
   type ReactNode,
 } from 'react';
 import { toast } from 'sonner';
-import { fr } from '../i18n/fr';
+import { txt } from '../i18n';
 
 export type AudioStatus = 'idle' | 'loading' | 'playing' | 'paused';
 
@@ -72,7 +72,7 @@ export function AudioPreviewProvider({ children }: { children: ReactNode }) {
   const fail = useCallback(() => {
     keyRef.current = null;
     setState(IDLE);
-    toast.error(fr.toasts.previewUnavailable);
+    toast.error(txt.toasts.previewUnavailable);
   }, []);
 
   const start = useCallback(

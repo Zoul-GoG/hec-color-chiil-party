@@ -3,13 +3,14 @@ import { AlertCircle, ArrowLeft, ArrowRight, Eye, EyeOff, Lock, Mail, ShieldChec
 import { useId, useState, type FormEvent } from 'react';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { Logo } from '../../components/Logo';
+import { LangToggle } from '../../components/LangToggle';
 import { ThemeToggle } from '../../components/ThemeToggle';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
 import { cn } from '../../components/ui/cn';
 import { ADMIN_ME_KEY, useAdminMe } from '../../hooks/useAdmin';
 import { useDocumentTitle } from '../../hooks/useDocumentTitle';
-import { fr } from '../../i18n/fr';
+import { txt } from '../../i18n';
 import { adminApi } from '../../lib/api';
 import { errorCode, errorMessage } from '../../lib/errors';
 
@@ -17,7 +18,7 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /** /admin/login (docs/07 §2). */
 export function LoginPage() {
-  useDocumentTitle(fr.titles.login);
+  useDocumentTitle(txt.titles.login);
   const me = useAdminMe();
   const qc = useQueryClient();
   const navigate = useNavigate();
@@ -33,8 +34,8 @@ export function LoginPage() {
 
   if (me.data) return <Navigate to="/admin" replace />;
 
-  const emailError = touched && !EMAIL_RE.test(email.trim()) ? fr.login.emailInvalid : null;
-  const passwordError = touched && !password ? fr.login.passwordRequired : null;
+  const emailError = touched && !EMAIL_RE.test(email.trim()) ? txt.login.emailInvalid : null;
+  const passwordError = touched && !password ? txt.login.passwordRequired : null;
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -48,7 +49,7 @@ export function LoginPage() {
       const from = (location.state as { from?: string } | null)?.from;
       navigate(from?.startsWith('/admin') && from !== '/admin/login' ? from : '/admin', { replace: true });
     } catch (err) {
-      setError(errorCode(err) === 'RATE_LIMITED' ? fr.login.tooMany : errorMessage(err));
+      setError(errorCode(err) === 'RATE_LIMITED' ? txt.login.tooMany : errorMessage(err));
       setSubmitting(false);
     }
   };
@@ -63,26 +64,29 @@ export function LoginPage() {
         <div className="absolute -top-24 -left-24 hidden size-96 rounded-full bg-brand-blue/18 blur-3xl dark:block" />
       </div>
       <header className="mx-auto flex h-16 w-full max-w-[1200px] items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Logo onDark suffix={fr.login.brandSuffix} />
-        <ThemeToggle />
+        <Logo onDark suffix={txt.login.brandSuffix} />
+        <div className="flex shrink-0 items-center gap-2">
+          <LangToggle />
+          <ThemeToggle />
+        </div>
       </header>
 
       <main className="flex flex-1 flex-col items-center justify-center px-4 py-8">
         <div className="w-full max-w-[420px] rounded-xl border border-border bg-surface px-6 py-8 shadow-float sm:px-10 sm:py-10">
           <div className="flex flex-col items-center text-center">
             <Badge variant="blue">
-              <ShieldCheck className="size-3.5" aria-hidden /> {fr.login.badge}
+              <ShieldCheck className="size-3.5" aria-hidden /> {txt.login.badge}
             </Badge>
             <h1 className="mt-4 font-display text-[26px] leading-8 font-bold text-fg sm:text-[32px] sm:leading-10">
-              {fr.login.title}
+              {txt.login.title}
             </h1>
-            <p className="mt-2 text-sm text-fg-muted">{fr.login.subtitle}</p>
+            <p className="mt-2 text-sm text-fg-muted">{txt.login.subtitle}</p>
           </div>
 
           <form className="mt-8 space-y-5" onSubmit={onSubmit} noValidate>
             <div>
               <label htmlFor={ids.email} className="mb-1.5 block text-sm font-semibold text-fg">
-                {fr.login.email}
+                {txt.login.email}
               </label>
               <div className="relative">
                 <Mail
@@ -96,7 +100,7 @@ export function LoginPage() {
                   inputMode="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder={fr.login.emailPlaceholder}
+                  placeholder={txt.login.emailPlaceholder}
                   aria-invalid={Boolean(emailError)}
                   aria-describedby={emailError ? ids.emailErr : undefined}
                   className={cn(inputCls, 'pr-4', emailError && 'border-brand-red')}
@@ -111,7 +115,7 @@ export function LoginPage() {
 
             <div>
               <label htmlFor={ids.password} className="mb-1.5 block text-sm font-semibold text-fg">
-                {fr.login.password}
+                {txt.login.password}
               </label>
               <div className="relative">
                 <Lock
@@ -131,7 +135,7 @@ export function LoginPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
-                  aria-label={showPassword ? fr.login.hidePassword : fr.login.showPassword}
+                  aria-label={showPassword ? txt.login.hidePassword : txt.login.showPassword}
                   aria-pressed={showPassword}
                   className="absolute top-1/2 right-1.5 inline-flex size-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-md text-fg-muted hover:bg-surface-3"
                 >
@@ -156,7 +160,7 @@ export function LoginPage() {
                 onChange={(e) => setRemember(e.target.checked)}
                 className="size-4 cursor-pointer accent-brand-blue"
               />
-              {fr.login.remember}
+              {txt.login.remember}
             </label>
 
             {error ? (
@@ -170,15 +174,15 @@ export function LoginPage() {
             ) : null}
 
             <Button type="submit" variant="primary" size="lg" loading={submitting} className="w-full">
-              {fr.login.submit} {submitting ? null : <ArrowRight className="size-5" aria-hidden />}
+              {txt.login.submit} {submitting ? null : <ArrowRight className="size-5" aria-hidden />}
             </Button>
           </form>
 
           <div className="mt-6 rounded-md bg-surface-2 px-4 py-3 text-center text-xs text-fg-muted">
             <p className="flex items-center justify-center gap-1.5 font-semibold text-fg">
-              <ShieldCheck className="size-4" aria-hidden /> {fr.login.restrictedTitle}
+              <ShieldCheck className="size-4" aria-hidden /> {txt.login.restrictedTitle}
             </p>
-            <p className="mt-1">{fr.login.restrictedText}</p>
+            <p className="mt-1">{txt.login.restrictedText}</p>
           </div>
         </div>
 
@@ -186,7 +190,7 @@ export function LoginPage() {
           to="/"
           className="mt-6 inline-flex items-center gap-2 rounded-md text-sm font-semibold text-white/90 hover:text-white dark:text-fg-muted dark:hover:text-fg"
         >
-          <ArrowLeft className="size-4" aria-hidden /> {fr.login.back}
+          <ArrowLeft className="size-4" aria-hidden /> {txt.login.back}
         </Link>
       </main>
     </div>

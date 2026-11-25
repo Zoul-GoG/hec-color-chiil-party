@@ -6,7 +6,7 @@ import { Badge, ExplicitBadge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
 import { cn } from '../../components/ui/cn';
 import { CountBadge } from '../../components/ui/CountBadge';
-import { fr } from '../../i18n/fr';
+import { txt } from '../../i18n';
 import { api } from '../../lib/api';
 import { formatDuration, prefersReducedMotion } from '../../lib/format';
 
@@ -50,9 +50,9 @@ export function TrackCard({ track, medal, highlighted, pending, onPlusOne, readO
             <span
               className="absolute -top-0.5 -left-0.5 text-lg leading-none drop-shadow"
               role="img"
-              aria-label={fr.track.rankAria(medal + 1)}
+              aria-label={txt.track.rankAria(medal + 1)}
             >
-              {fr.track.medal[medal]}
+              {txt.track.medal[medal]}
             </span>
           ) : null}
         </TrackCover>
@@ -67,7 +67,7 @@ export function TrackCard({ track, medal, highlighted, pending, onPlusOne, readO
                 {track.genre}
               </Badge>
             ) : null}
-            {track.explicit ? <ExplicitBadge label={fr.track.explicit} /> : null}
+            {track.explicit ? <ExplicitBadge label={txt.track.explicit} /> : null}
           </div>
         </div>
         <CountBadge count={track.addCount} />
@@ -77,7 +77,7 @@ export function TrackCard({ track, medal, highlighted, pending, onPlusOne, readO
           trackKey={track.trackKey}
           title={track.title}
           available={track.hasPreview}
-          label={fr.track.preview}
+          label={txt.track.preview}
           source={() => ({
             resolve: () => api.preview(track.trackKey, track.deezerId).then((r) => r.previewUrl),
             meta: { title: track.title, artist: track.artist, cover: track.coverSmall },
@@ -85,17 +85,17 @@ export function TrackCard({ track, medal, highlighted, pending, onPlusOne, readO
         />
         {track.addedByMe ? (
           <Badge variant="blue" className="h-8 px-3">
-            {fr.track.addedByMe}
+            {txt.track.addedByMe}
           </Badge>
         ) : readOnly ? null : (
           <Button
             variant="primary"
             size="sm"
             loading={pending}
-            aria-label={fr.track.plusOneAria(track.title)}
+            aria-label={txt.track.plusOneAria(track.title)}
             onClick={(e) => onPlusOne(track, e.currentTarget)}
           >
-            <span className="tabular">+1</span> {fr.track.plusOne}
+            <span className="tabular">+1</span> {txt.track.plusOne}
           </Button>
         )}
       </div>

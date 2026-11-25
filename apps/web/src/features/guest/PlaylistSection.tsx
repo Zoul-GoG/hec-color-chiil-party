@@ -5,7 +5,7 @@ import { Button } from '../../components/ui/Button';
 import { cn } from '../../components/ui/cn';
 import { supportsIntersectionObserver, useInfiniteScroll } from '../../hooks/useInfiniteScroll';
 import { useTracks } from '../../hooks/useTracks';
-import { fr } from '../../i18n/fr';
+import { txt } from '../../i18n';
 import { TrackCard, TrackCardSkeleton } from './TrackCard';
 
 interface Props {
@@ -16,9 +16,9 @@ interface Props {
   readOnly?: boolean;
 }
 
-const TABS: { id: PublicSort; label: string }[] = [
-  { id: 'popular', label: fr.playlist.popular },
-  { id: 'recent', label: fr.playlist.recent },
+const TABS: { id: PublicSort; label: () => string }[] = [
+  { id: 'popular', label: () => txt.playlist.popular },
+  { id: 'recent', label: () => txt.playlist.recent },
 ];
 
 /** US-4: guests' playlist with tabs, polling and infinite scroll (24 per page). */
@@ -46,15 +46,15 @@ export function PlaylistSection({
         <div className="flex items-center gap-2.5">
           <span aria-hidden className="size-2.5 shrink-0 rounded-full bg-brand-red" />
           <h2 id="playlist-title" className="font-display text-[22px] leading-7 font-bold text-fg">
-            {fr.playlist.title}
+            {txt.playlist.title}
           </h2>
           {total !== undefined ? (
-            <span className="tabular text-sm text-fg-muted">{fr.playlist.count(total)}</span>
+            <span className="tabular text-sm text-fg-muted">{txt.playlist.count(total)}</span>
           ) : null}
         </div>
         <div
           role="tablist"
-          aria-label={fr.playlist.tabsLabel}
+          aria-label={txt.playlist.tabsLabel}
           className="inline-flex self-start rounded-full border border-border bg-surface-2 p-1"
         >
           {TABS.map((t) => (
@@ -69,7 +69,7 @@ export function PlaylistSection({
                 sort === t.id ? 'bg-brand-red text-white shadow-card' : 'text-fg-muted hover:text-fg',
               )}
             >
-              {t.label}
+              {t.label()}
             </button>
           ))}
         </div>
@@ -89,10 +89,10 @@ export function PlaylistSection({
           >
             <span className="flex items-center gap-2">
               <AlertTriangle className="size-5 text-brand-red-text" aria-hidden />
-              {fr.playlist.error}
+              {txt.playlist.error}
             </span>
             <Button size="sm" onClick={() => void q.refetch()}>
-              {fr.playlist.retry}
+              {txt.playlist.retry}
             </Button>
           </div>
         ) : tracks.length === 0 ? (
@@ -114,18 +114,18 @@ export function PlaylistSection({
             </div>
             <div ref={sentinelRef} className="mt-6 flex min-h-10 justify-center" aria-live="polite">
               {!q.hasNextPage ? (
-                <p className="text-sm text-fg-subtle">{fr.playlist.end}</p>
+                <p className="text-sm text-fg-subtle">{txt.playlist.end}</p>
               ) : q.isFetchingNextPage ? (
                 <span className="inline-flex items-center gap-2 text-sm text-fg-muted">
                   <Loader2 className="size-4 animate-spin" aria-hidden />
-                  {fr.playlist.loadingMore}
+                  {txt.playlist.loadingMore}
                 </span>
               ) : pageError ? (
                 <Button size="sm" onClick={() => void q.fetchNextPage()}>
-                  {fr.playlist.retry}
+                  {txt.playlist.retry}
                 </Button>
               ) : !supportsIntersectionObserver() ? (
-                <Button onClick={() => void q.fetchNextPage()}>{fr.playlist.loadMore}</Button>
+                <Button onClick={() => void q.fetchNextPage()}>{txt.playlist.loadMore}</Button>
               ) : null}
             </div>
           </>
@@ -146,12 +146,12 @@ function EmptyPlaylist({ onFocusSearch }: { onFocusSearch?: () => void }) {
         <span className="absolute bottom-0 -left-4 size-1.5 rounded-full bg-party-purple" />
         <span className="absolute -right-2 -bottom-2 size-1.5 rotate-45 rounded-[2px] bg-party-orange" />
       </div>
-      <p className="font-display text-lg font-bold text-fg">{fr.playlist.emptyTitle}</p>
+      <p className="font-display text-lg font-bold text-fg">{txt.playlist.emptyTitle}</p>
       {onFocusSearch ? (
         <>
-          <p className="mt-1 text-sm text-fg-muted">{fr.playlist.emptyText}</p>
+          <p className="mt-1 text-sm text-fg-muted">{txt.playlist.emptyText}</p>
           <Button variant="primary" className="mt-5" onClick={onFocusSearch}>
-            {fr.playlist.emptyCta}
+            {txt.playlist.emptyCta}
           </Button>
         </>
       ) : null}

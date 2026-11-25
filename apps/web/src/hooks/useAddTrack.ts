@@ -2,7 +2,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useCallback, useState } from 'react';
 import { toast } from 'sonner';
 import { useAudioPreview } from '../audio/AudioPreviewProvider';
-import { fr } from '../i18n/fr';
+import { txt } from '../i18n';
 import { api, ApiError } from '../lib/api';
 import { celebrate } from '../lib/confetti';
 import { errorMessage } from '../lib/errors';
@@ -24,12 +24,12 @@ export function useAddTrack(onAdded?: (trackKey: string) => void) {
         const res = await api.addTrack(deezerId);
         const { title, artist } = res.track;
         if (res.alreadyAddedByMe) {
-          toast(fr.toasts.already);
+          toast(txt.toasts.already);
         } else {
           toast.success(
             res.created || res.othersCount === 0
-              ? fr.toasts.created(title, artist)
-              : fr.toasts.joined(title, res.othersCount),
+              ? txt.toasts.created(title, artist)
+              : txt.toasts.joined(title, res.othersCount),
           );
           celebrate(origin);
         }

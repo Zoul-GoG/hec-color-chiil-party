@@ -4,7 +4,7 @@ import { Chip } from '../../components/ui/Chip';
 import { SEARCH_DEBOUNCE_MS, SEARCH_MIN_CHARS } from '../../config';
 import { useDebouncedValue } from '../../hooks/useDebouncedValue';
 import { useSearch } from '../../hooks/useSearch';
-import { fr } from '../../i18n/fr';
+import { txt } from '../../i18n';
 import { SearchBox } from './SearchBox';
 import { SuggestionList } from './SuggestionList';
 
@@ -56,8 +56,8 @@ export const SearchSection = forwardRef<SearchSectionHandle, Props>(function Sea
       />
       {!value ? (
         <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
-          <span className="text-sm text-fg-muted">{fr.search.ideas}</span>
-          {fr.search.ideaChips.map((idea, i) => (
+          <span className="text-sm text-fg-muted">{txt.search.ideas}</span>
+          {txt.search.ideaChips.map((idea, i) => (
             <Chip key={idea} dot={i} onClick={() => pickIdea(idea)}>
               {idea}
             </Chip>

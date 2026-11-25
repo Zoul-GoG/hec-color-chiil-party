@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { POLL_INTERVAL_MS } from '../config';
-import { fr } from '../i18n/fr';
+import { txt } from '../i18n';
 import { adminApi, api } from '../lib/api';
 import { errorMessage } from '../lib/errors';
 
@@ -25,7 +25,7 @@ export function useToggleSubmissions() {
     mutationFn: (open: boolean) => adminApi.setSubmissionsOpen(open),
     onSuccess: (res) => {
       qc.setQueryData(SETTINGS_KEY, (old: object | undefined) => ({ ...(old ?? {}), ...res }));
-      toast.success(res.submissionsOpen ? fr.closed.openedToast : fr.closed.closedToast);
+      toast.success(res.submissionsOpen ? txt.closed.openedToast : txt.closed.closedToast);
     },
     onError: (e) => toast.error(errorMessage(e)),
     onSettled: () => void qc.invalidateQueries({ queryKey: SETTINGS_KEY }),

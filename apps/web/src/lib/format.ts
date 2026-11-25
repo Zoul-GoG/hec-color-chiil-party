@@ -1,3 +1,5 @@
+import { locale } from '../i18n';
+
 /** 191 -> "3:11" */
 export function formatDuration(seconds: number): string {
   const s = Math.max(0, Math.round(seconds));
@@ -6,7 +8,7 @@ export function formatDuration(seconds: number): string {
 
 /** ISO -> "21:04" (local time; Abidjan = UTC). */
 export function formatTime(iso: string): string {
-  return new Date(iso).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+  return new Date(iso).toLocaleTimeString(locale(), { hour: '2-digit', minute: '2-digit' });
 }
 
 export function prefersReducedMotion(): boolean {

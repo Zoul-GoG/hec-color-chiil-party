@@ -7,5 +7,6 @@ export const PLAYLIST_PAGE_SIZE = 24;
 export const ADMIN_PAGE_SIZE = 50;
 export const STORAGE_KEYS = {
   theme: 'hcc-theme',
+  lang: 'hcc-lang',
   guestId: 'hcc-guest-id',
 } as const;

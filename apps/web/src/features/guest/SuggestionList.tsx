@@ -5,7 +5,7 @@ import { TrackCover } from '../../components/TrackCover';
 import { Badge, ExplicitBadge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
 import { Skeleton } from '../../components/ui/Skeleton';
-import { fr } from '../../i18n/fr';
+import { txt } from '../../i18n';
 import { api } from '../../lib/api';
 import { errorCode } from '../../lib/errors';
 import { formatDuration } from '../../lib/format';
@@ -26,22 +26,22 @@ export function SuggestionList({ query, items, isLoading, error, onRetry, onAdd,
   return (
     <section
       id={SUGGESTIONS_ID}
-      aria-label={fr.search.resultsHeader}
+      aria-label={txt.search.resultsHeader}
       aria-busy={isLoading}
       className="animate-fade-in mt-3 rounded-lg border border-border bg-surface p-2 shadow-float sm:p-3"
     >
       <div className="flex items-center justify-between px-2 pt-1 pb-2">
         <h2 className="text-[11px] leading-[14px] font-bold tracking-[0.06em] text-fg-muted">
-          {fr.search.resultsHeader}
+          {txt.search.resultsHeader}
         </h2>
         {items && !isLoading ? (
           <span className="tabular text-xs font-medium text-brand-blue-text">
-            {fr.search.resultsCount(items.length)}
+            {txt.search.resultsCount(items.length)}
           </span>
         ) : null}
       </div>
       {isLoading ? (
-        <ul aria-label={fr.search.loading}>
+        <ul aria-label={txt.search.loading}>
           {Array.from({ length: 4 }, (_, i) => (
             <li key={i} className="flex h-16 items-center gap-3 px-2">
               <Skeleton className="size-12" />
@@ -56,7 +56,7 @@ export function SuggestionList({ query, items, isLoading, error, onRetry, onAdd,
       ) : error ? (
         <SearchError error={error} onRetry={onRetry} />
       ) : items && items.length === 0 ? (
-        <p className="px-2 py-6 text-center text-sm text-fg-muted">{fr.search.empty(query)}</p>
+        <p className="px-2 py-6 text-center text-sm text-fg-muted">{txt.search.empty(query)}</p>
       ) : (
         <ul className="divide-y divide-border">
           {items?.map((item) => (
@@ -72,10 +72,10 @@ function SearchError({ error, onRetry }: { error: unknown; onRetry: () => void }
   const code = errorCode(error);
   const message =
     code === 'RATE_LIMITED'
-      ? fr.errors.RATE_LIMITED
+      ? txt.errors.RATE_LIMITED
       : code === 'VALIDATION_ERROR'
-        ? fr.errors.VALIDATION_ERROR
-        : fr.errors.DEEZER_UNAVAILABLE;
+        ? txt.errors.VALIDATION_ERROR
+        : txt.errors.DEEZER_UNAVAILABLE;
   return (
     <div
       role="alert"
@@ -84,7 +84,7 @@ function SearchError({ error, onRetry }: { error: unknown; onRetry: () => void }
       <AlertTriangle className="size-6 text-brand-red-text" aria-hidden />
       <p>{message}</p>
       <Button size="sm" onClick={onRetry}>
-        {fr.search.retry}
+        {txt.search.retry}
       </Button>
     </div>
   );
@@ -105,7 +105,7 @@ function SuggestionRow({
       <div className="min-w-0 flex-1">
         <div className="flex min-w-0 items-center gap-1.5">
           <p className="truncate font-display text-base leading-[22px] font-semibold text-fg">{item.title}</p>
-          {item.explicit ? <ExplicitBadge label={fr.track.explicit} /> : null}
+          {item.explicit ? <ExplicitBadge label={txt.track.explicit} /> : null}
         </div>
         <div className="flex min-w-0 items-center gap-2">
           <p className="truncate text-sm text-fg-muted">
@@ -113,7 +113,7 @@ function SuggestionRow({
           </p>
           {item.addCount > 0 && !item.addedByMe ? (
             <Badge variant="red" className="max-[399px]:hidden">
-              {fr.track.alreadyAdded(item.addCount)}
+              {txt.track.alreadyAdded(item.addCount)}
             </Badge>
           ) : null}
         </div>
@@ -123,7 +123,7 @@ function SuggestionRow({
           trackKey={item.trackKey}
           title={item.title}
           available={Boolean(item.previewUrl)}
-          label={fr.track.preview}
+          label={txt.track.preview}
           source={() => ({
             url: item.previewUrl,
             resolve: () => api.preview(item.trackKey, item.deezerId).then((r) => r.previewUrl),
@@ -132,19 +132,19 @@ function SuggestionRow({
         />
         {item.addedByMe ? (
           <Badge variant="blue" className="h-10 px-3">
-            {fr.track.addedByMe}
+            {txt.track.addedByMe}
           </Badge>
         ) : (
           <Button
             variant="primary"
             size="icon"
             loading={pending}
-            aria-label={fr.track.addAria(item.title)}
+            aria-label={txt.track.addAria(item.title)}
             onClick={(e) => onAdd(item, e.currentTarget)}
             className="sm:w-auto sm:gap-1.5 sm:rounded-md! sm:px-4 sm:text-sm"
           >
             {pending ? null : <Plus className="size-5 shrink-0 sm:size-4" aria-hidden />}
-            <span className="hidden sm:inline">{fr.track.add}</span>
+            <span className="hidden sm:inline">{txt.track.add}</span>
           </Button>
         )}
       </div>

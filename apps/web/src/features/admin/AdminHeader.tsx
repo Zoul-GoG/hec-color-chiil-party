@@ -3,14 +3,14 @@ import { LogOut } from 'lucide-react';
 import { Header } from '../../components/Header';
 import { Button } from '../../components/ui/Button';
 import { useAdminMe, useLogout } from '../../hooks/useAdmin';
-import { fr } from '../../i18n/fr';
+import { txt } from '../../i18n';
 
 export function AdminHeader({ extra }: { extra?: ReactNode }) {
   const me = useAdminMe();
   const logout = useLogout();
   return (
     <Header
-      suffix={fr.admin.suffix}
+      suffix={txt.admin.suffix}
       right={
         <>
           {extra}
@@ -22,11 +22,11 @@ export function AdminHeader({ extra }: { extra?: ReactNode }) {
             size="md"
             loading={logout.isPending}
             onClick={() => logout.mutate()}
-            aria-label={fr.admin.logout}
+            aria-label={txt.admin.logout}
             className="max-sm:size-10 max-sm:px-0"
           >
             {logout.isPending ? null : <LogOut className="size-4" aria-hidden />}
-            <span className="hidden sm:inline">{fr.admin.logout}</span>
+            <span className="hidden sm:inline">{txt.admin.logout}</span>
           </Button>
         </>
       }

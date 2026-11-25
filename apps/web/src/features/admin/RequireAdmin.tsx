@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { Spinner } from '../../components/ui/Spinner';
 import { useAdminMe } from '../../hooks/useAdmin';
-import { fr } from '../../i18n/fr';
+import { txt } from '../../i18n';
 
 /** Redirects to /admin/login when the session cookie is missing/expired. */
 export function RequireAdmin({ children }: { children: ReactNode }) {
@@ -12,7 +12,7 @@ export function RequireAdmin({ children }: { children: ReactNode }) {
     return (
       <div className="flex min-h-dvh items-center justify-center text-fg-muted" role="status">
         <Spinner className="size-6" />
-        <span className="sr-only">{fr.admin.loading}</span>
+        <span className="sr-only">{txt.admin.loading}</span>
       </div>
     );
   }

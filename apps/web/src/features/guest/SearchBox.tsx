@@ -1,7 +1,7 @@
 import { Search, X } from 'lucide-react';
 import { forwardRef, useEffect, type KeyboardEvent } from 'react';
 import { Spinner } from '../../components/ui/Spinner';
-import { fr } from '../../i18n/fr';
+import { txt } from '../../i18n';
 
 export const SUGGESTIONS_ID = 'search-suggestions';
 
@@ -50,8 +50,8 @@ export const SearchBox = forwardRef<HTMLInputElement, Props>(function SearchBox(
         value={value}
         onChange={(e) => onChange(e.target.value)}
         onKeyDown={onKeyDown}
-        placeholder={fr.search.placeholder}
-        aria-label={fr.search.label}
+        placeholder={txt.search.placeholder}
+        aria-label={txt.search.label}
         role="combobox"
         aria-expanded={expanded}
         aria-controls={SUGGESTIONS_ID}
@@ -70,7 +70,7 @@ export const SearchBox = forwardRef<HTMLInputElement, Props>(function SearchBox(
           <button
             type="button"
             onClick={() => onChange('')}
-            aria-label={fr.search.clear}
+            aria-label={txt.search.clear}
             className="inline-flex size-8 cursor-pointer items-center justify-center rounded-full text-fg-muted hover:bg-surface-2"
           >
             <X className="size-4" aria-hidden />

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { fr } from '../i18n/fr';
+import { txt } from '../i18n';
 
 export function Footer() {
   return (
@@ -8,7 +8,7 @@ export function Footer() {
         <div className="flex items-center gap-3">
           <img
             src="/hec-abidjan-logo.png"
-            alt={fr.brand.logoAlt}
+            alt={txt.brand.logoAlt}
             className="h-10 w-auto"
             width={61}
             height={40}
@@ -16,20 +16,20 @@ export function Footer() {
           />
           <img
             src="/bde-hec-abidjan-logo.png"
-            alt={fr.brand.bdeLogoAlt}
+            alt={txt.brand.bdeLogoAlt}
             className="h-10 w-auto"
             width={35}
             height={40}
             loading="lazy"
           />
-          <p className="font-semibold text-fg-muted">{fr.footer.org}</p>
+          <p className="font-semibold text-fg-muted">{txt.footer.org}</p>
         </div>
-        <p>{fr.footer.event}</p>
-        {/* <p>{fr.footer.deezer}</p> */}
+        <p>{txt.footer.event}</p>
+        {/* <p>{txt.footer.deezer}</p> */}
         <p className="flex items-center gap-3">
-          <span>{fr.footer.copyright}</span>
+          <span>{txt.footer.copyright}</span>
           <Link to="/admin/login" className="underline-offset-2 hover:text-brand-blue-text hover:underline">
-            {fr.footer.admin}
+            {txt.footer.admin}
           </Link>
         </p>
       </div>

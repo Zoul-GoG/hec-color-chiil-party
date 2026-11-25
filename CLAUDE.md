@@ -55,7 +55,8 @@ pnpm --filter api seed:admin   # crée/maj l'admin depuis ADMIN_EMAIL / ADMIN_PA
 ## 5. Règles de code
 
 - **Langue** : code, noms de variables, commits en anglais. **Tous les textes UI en français** (tutoiement, ton festif).
-  Centraliser les chaînes UI dans `apps/web/src/i18n/fr.ts`.
+  Centraliser les chaînes UI dans `apps/web/src/i18n/fr.ts` (référence) **et** `apps/web/src/i18n/en.ts` (version anglaise, même structure, vérifiée par le type `Messages`).
+  Les composants lisent `txt` (importé de `src/i18n`) **au rendu** — ne jamais copier une chaîne dans une constante de module.
 - TypeScript `strict: true`, pas de `any` non justifié. Les types d'échange API vivent dans `packages/shared` et sont importés des deux côtés.
 - Le **front n'appelle jamais `api.deezer.com`** (pas de CORS + quotas) : toujours via `/api/...`.
 - Le back **ne fait jamais confiance aux métadonnées envoyées par le client** : à l'ajout, le client n'envoie que `deezerId`, le back refetch le morceau chez Deezer.

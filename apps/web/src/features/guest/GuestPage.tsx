@@ -9,7 +9,7 @@ import { MiniPlayer } from '../../components/MiniPlayer';
 import { useSubmissionsOpen } from '../../hooks/useSettings';
 import { useAddTrack } from '../../hooks/useAddTrack';
 import { useDocumentTitle } from '../../hooks/useDocumentTitle';
-import { fr } from '../../i18n/fr';
+import { txt } from '../../i18n';
 import { Hero } from './Hero';
 import { PlaylistSection } from './PlaylistSection';
 import { SearchSection, type SearchSectionHandle } from './SearchSection';
@@ -17,7 +17,7 @@ import { SearchSection, type SearchSectionHandle } from './SearchSection';
 const HIGHLIGHT_MS = 2000;
 
 export function GuestPage() {
-  useDocumentTitle(fr.titles.home);
+  useDocumentTitle(txt.titles.home);
   const searchRef = useRef<SearchSectionHandle>(null);
   const [highlightKey, setHighlightKey] = useState<string | null>(null);
   const { add, isPending } = useAddTrack(setHighlightKey);
@@ -52,7 +52,7 @@ export function GuestPage() {
               className="mx-auto mt-8 flex max-w-2xl items-center justify-center gap-2 rounded-lg border border-border bg-surface px-4 py-4 text-center font-display font-semibold text-fg shadow-card"
             >
               <Lock className="size-5 shrink-0 text-brand-red-text" aria-hidden />
-              {fr.closed.banner}
+              {txt.closed.banner}
             </p>
           )}
           <PlaylistSection

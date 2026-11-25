@@ -13,11 +13,18 @@ import type { ReactNode } from 'react';
 import { Card } from '../../components/ui/Card';
 import { cn } from '../../components/ui/cn';
 import { Skeleton } from '../../components/ui/Skeleton';
-import { fr } from '../../i18n/fr';
+import { genreLabel, locale, OTHER_GENRE, txt } from '../../i18n';
 
-const nf = new Intl.NumberFormat('fr-FR');
-const nf1 = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1, minimumFractionDigits: 1 });
-const pf = new Intl.NumberFormat('fr-FR', { style: 'percent', maximumFractionDigits: 0 });
+// Formatters follow the current UI language (read at render time).
+const nf = { format: (v: number) => new Intl.NumberFormat(locale()).format(v) };
+const nf1 = {
+  format: (v: number) =>
+    new Intl.NumberFormat(locale(), { maximumFractionDigits: 1, minimumFractionDigits: 1 }).format(v),
+};
+const pf = {
+  format: (v: number) =>
+    new Intl.NumberFormat(locale(), { style: 'percent', maximumFractionDigits: 0 }).format(v),
+};
 
 interface Props {
   stats?: StatsDto;
@@ -53,9 +60,9 @@ function Kpi({
       ) : error || value === undefined ? (
         <p
           className="flex items-center gap-2 font-display text-3xl font-bold text-fg-subtle"
-          title={fr.dashboard.kpi.error}
+          title={txt.dashboard.kpi.error}
         >
-          — <AlertTriangle className="size-5 text-brand-red-text" aria-label={fr.dashboard.kpi.error} />
+          — <AlertTriangle className="size-5 text-brand-red-text" aria-label={txt.dashboard.kpi.error} />
         </p>
       ) : (
         <p className="tabular font-display text-3xl leading-9 font-bold text-fg">{nf.format(value)}</p>
@@ -82,14 +89,14 @@ function Variation({ last, prev }: { last: number; prev: number }) {
         {up ? '+' : '−'}
         {pf.format(Math.abs(delta))}
       </span>
-      {fr.dashboard.kpi.vsPrev}
+      {txt.dashboard.kpi.vsPrev}
     </span>
   );
 }
 
 /** US-7 KPI grid: 2 cols mobile, 4 cols desktop. */
 export function KpiCards({ stats, loading, error }: Props) {
-  const k = fr.dashboard.kpi;
+  const k = txt.dashboard.kpi;
   return (
     <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
       <Kpi label={k.uniqueTracks} icon={Disc3} value={stats?.uniqueTracks} loading={loading} error={error} />
@@ -125,7 +132,7 @@ export function TopArtistCard({ stats, loading }: { stats?: StatsDto; loading: b
   return (
     <Card className="flex flex-col gap-2">
       <h3 className="text-[11px] leading-[14px] font-bold tracking-[0.06em] text-fg-muted uppercase">
-        {fr.dashboard.topArtist}
+        {txt.dashboard.topArtist}
       </h3>
       {loading ? (
         <Skeleton className="h-7 w-40" />
@@ -135,11 +142,11 @@ export function TopArtistCard({ stats, loading }: { stats?: StatsDto; loading: b
             {stats.topArtist.name}
           </p>
           <p className="tabular text-sm text-fg-muted">
-            {fr.dashboard.topArtistCount(stats.topArtist.count)}
+            {txt.dashboard.topArtistCount(stats.topArtist.count)}
           </p>
         </>
       ) : (
-        <p className="text-sm text-fg-muted">{fr.dashboard.noData}</p>
+        <p className="text-sm text-fg-muted">{txt.dashboard.noData}</p>
       )}
     </Card>
   );
@@ -151,17 +158,17 @@ export function GenreCard({ stats, loading }: { stats?: StatsDto; loading: boole
   let ci = 0;
   const colored = genres.map((g) => ({
     ...g,
-    color: g.name === 'Autres' ? OTHER_COLOR : GENRE_COLORS[ci++ % GENRE_COLORS.length],
+    color: g.name === OTHER_GENRE ? OTHER_COLOR : GENRE_COLORS[ci++ % GENRE_COLORS.length],
   }));
   return (
     <Card className="flex flex-col gap-3">
       <h3 className="text-[11px] leading-[14px] font-bold tracking-[0.06em] text-fg-muted uppercase">
-        {fr.dashboard.genres}
+        {txt.dashboard.genres}
       </h3>
       {loading ? (
         <Skeleton className="h-3 w-full" />
       ) : colored.length === 0 ? (
-        <p className="text-sm text-fg-muted">{fr.dashboard.noData}</p>
+        <p className="text-sm text-fg-muted">{txt.dashboard.noData}</p>
       ) : (
         <>
           <div className="flex h-3 w-full gap-0.5 overflow-hidden rounded-full" aria-hidden>
@@ -170,7 +177,7 @@ export function GenreCard({ stats, loading }: { stats?: StatsDto; loading: boole
                 key={g.name}
                 className={cn('h-full first:rounded-l-full last:rounded-r-full', g.color)}
                 style={{ width: `${g.share * 100}%` }}
-                title={`${g.name} · ${pf.format(g.share)}`}
+                title={`${genreLabel(g.name)} · ${pf.format(g.share)}`}
               />
             ))}
           </div>
@@ -178,7 +185,7 @@ export function GenreCard({ stats, loading }: { stats?: StatsDto; loading: boole
             {colored.map((g) => (
               <li key={g.name} className="flex min-w-0 items-center gap-1.5">
                 <span aria-hidden className={cn('size-2.5 shrink-0 rounded-full', g.color)} />
-                <span className="truncate text-fg">{g.name}</span>
+                <span className="truncate text-fg">{genreLabel(g.name)}</span>
                 <span className="tabular text-fg-muted">{pf.format(g.share)}</span>
               </li>
             ))}

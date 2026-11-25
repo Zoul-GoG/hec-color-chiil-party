@@ -1,6 +1,6 @@
 import { Pause, Play, X } from 'lucide-react';
 import { useAudioPreview } from '../audio/AudioPreviewProvider';
-import { fr } from '../i18n/fr';
+import { txt } from '../i18n';
 import { TrackCover } from './TrackCover';
 
 /** US-12: sticky mini-player on mobile while a preview plays. */
@@ -11,7 +11,7 @@ export function MiniPlayer() {
   return (
     <div
       role="region"
-      aria-label={fr.player.label}
+      aria-label={txt.player.label}
       className="animate-fade-in fixed inset-x-0 bottom-0 z-40 border-t border-border bg-surface/95 shadow-float backdrop-blur sm:hidden"
       style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
     >
@@ -27,7 +27,7 @@ export function MiniPlayer() {
         <button
           type="button"
           onClick={togglePause}
-          aria-label={playing ? fr.player.pause : fr.player.play}
+          aria-label={playing ? txt.player.pause : txt.player.play}
           className="inline-flex size-11 cursor-pointer items-center justify-center rounded-full bg-brand-red text-white"
         >
           {playing ? (
@@ -39,7 +39,7 @@ export function MiniPlayer() {
         <button
           type="button"
           onClick={stop}
-          aria-label={fr.player.close}
+          aria-label={txt.player.close}
           className="inline-flex size-11 cursor-pointer items-center justify-center rounded-full text-fg-muted hover:bg-surface-2"
         >
           <X className="size-5" aria-hidden />
