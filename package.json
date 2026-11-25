@@ -1,0 +1,30 @@
+{
+  "name": "hec-color-chill-party",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Playlist collaborative de la HEC Color & Chill Party (HEC Abidjan)",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "pnpm --filter @hcc/shared build && concurrently -k -n shared,api,web -c gray,blue,magenta \"pnpm --filter @hcc/shared dev\" \"pnpm --filter api dev\" \"pnpm --filter web dev\"",
+    "build": "pnpm --filter @hcc/shared build && pnpm --filter web build && pnpm --filter api build",
+    "start": "node apps/api/dist/main.js",
+    "test": "pnpm --filter @hcc/shared build && pnpm -r --workspace-concurrency=1 test",
+    "lint": "eslint .",
+    "typecheck": "pnpm --filter @hcc/shared build && pnpm -r typecheck",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.0",
+    "concurrently": "^9.2.0",
+    "eslint": "^9.39.0",
+    "eslint-config-prettier": "^10.1.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.20",
+    "globals": "^16.3.0",
+    "prettier": "^3.6.0",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.46.0"
+  }
+}

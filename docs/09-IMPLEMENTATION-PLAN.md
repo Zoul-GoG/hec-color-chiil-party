@@ -1,0 +1,90 @@
+# 09 — Plan d'implémentation (à cocher au fur et à mesure)
+
+Règle : terminer chaque phase (tests verts + critères « Terminé quand ») avant la suivante. Les items `P1` sont regroupés en Phase 7.
+Commit à la fin de chaque phase : `feat(phase-N): …`.
+
+## Phase 0 — Socle (≈ 1 h)
+- [x] Monorepo pnpm : `apps/api` (Nest CLI), `apps/web` (Vite React TS), `packages/shared` (TS, build `tsup` ou `tsc`).
+- [x] TS strict partout, ESLint + Prettier, scripts racine `dev` (concurrently), `build`, `start`, `test`, `lint`, `typecheck`.
+- [x] `.env.example` (cf. `08-DEPLOYMENT.md §1`), `config/env.ts` (zod), `.gitignore`.
+- [x] Nest : préfixe `/api`, helmet, cookie-parser, compression, `trust proxy`, `ValidationPipe({ whitelist: true, transform: true })`, `AllExceptionsFilter`, `MongooseModule.forRootAsync`.
+- [x] `GET /api/health`.
+- [x] Vite : proxy `/api` → `http://localhost:3000`.
+- [x] Fixture de recherche **déjà fournie** (`apps/api/test/fixtures/deezer-search-bahi.json`) ; enregistrer `/track/{id}` et `/album/{id}` (`curl`) en `deezer-track.json` / `deezer-album.json`.
+- [x] Config : 4 variables (`08-DEPLOYMENT.md §1`), constantes dans `config/constants.ts` et `web/src/config.ts`.
+- **Terminé quand** : `pnpm dev` lance les deux apps, `curl localhost:5173/api/health` → ok, fixtures présentes.
+
+## Phase 1 — Backend public (≈ 3 h)
+- [ ] `packages/shared` : types de `03-API.md §2` + `ErrorCode`.
+- [ ] `DeezerModule` : `search`, `getTrack`, `getAlbumGenre`, mapping + `trackKey`, dédoublonnage ISRC, cache LRU 5 min, limiteur bottleneck (20 / 5 s), file bornée, disjoncteur quota, dédoublonnage en vol, timeout 5 s, gestion `body.error`, `parsePreviewExpiry` — + tests du `05-DEEZER.md §8`.
+- [ ] Schémas `Track`, `Addition` + index (`04-DATA-MODEL.md`).
+- [ ] Décorateur `@GuestId()` (lit/valide `X-Guest-Id`).
+- [ ] `GET /api/search` (enrichi `addCount`/`addedByMe`, exclut masqués).
+- [ ] `POST /api/additions` (flux atomique §3.2, genre en tâche de fond).
+- [ ] `GET /api/tracks` (popular/recent, pagination, `addedByMe`).
+- [ ] `GET /api/tracks/:trackKey/preview` (rafraîchissement si expiré, extraits ≈ 15 min).
+- [ ] Throttling (tableau `02-ARCHITECTURE.md §6`).
+- [ ] Tests :
+  - unitaires DeezerService (fixtures, quota code 4 → retry → 503, 800 → 404, cache hit) ;
+  - e2e (mongodb-memory-server, Deezer mocké) : ajout → 201 ; même invité même morceau → 200 `alreadyAddedByMe` et `addCount` inchangé ; 2ᵉ invité → `addCount=2` ; ajout de l'id 745229932 puis 1014597302 (même ISRC) par 2 invités → **un seul** track avec `addCount=2` ; 20 ajouts concurrents de 20 invités → `addCount=20` exactement ; morceau masqué → 409 ; sans `X-Guest-Id` → 400 ; tri popular correct.
+- **Terminé quand** : tous les tests passent ; `curl` manuel de chaque route conforme au contrat.
+
+## Phase 2 — Front invité (≈ 4 h)
+- [ ] Tailwind v4 + `styles/tokens.css` (copie de `06 §3`), polices, script anti‑flash, `ThemeProvider` + `ThemeToggle` (localStorage `hcc-theme`).
+- [ ] `lib/guestId.ts` (UUID via `crypto.randomUUID()`, clé `hcc-guest-id`), `lib/api.ts` (fetch typé, en‑tête `X-Guest-Id`, parse erreurs → `ApiError{code}`), `i18n/fr.ts`.
+- [ ] Composants UI de base (Button, Badge, CountBadge, Chip, Card, Skeleton, PreviewButton), Header, Footer.
+- [ ] `AudioPreviewProvider` : un seul `HTMLAudioElement`, `play(trackKey, urlOrResolver)`, `pause()`, état `{currentKey, progress, status}`, stop à la fin, retry via `/preview` sur erreur.
+- [ ] `SearchBox` + `useDebouncedValue` + `useSearch` (TanStack Query, `enabled: q.length>=2`, `signal` d'annulation, `staleTime` 60 s) + chips d'idées.
+- [ ] `SuggestionList` avec tous ses états.
+- [ ] `useAddTrack` (mutation) : stop audio → vider input → toasts selon réponse → confettis → `invalidateQueries(['tracks'])` → highlight.
+- [ ] `PlaylistGrid` + `TrackCard` + onglets + « Charger plus » (`useInfiniteQuery`) + polling 15 s + bouton « +1 ».
+- [ ] Responsive 375 / 768 / 1280 ; light + dark ; `prefers-reduced-motion`.
+- [ ] Tests Vitest : debounce (pas d'appel avant 1000 ms ni sous 3 caractères, 1 seul appel après frappe rapide) ; après ajout l'input est vide et les suggestions masquées ; toast affiché avec titre et artiste ; « Ajouté ✓ » quand `addedByMe`.
+- **Terminé quand** : parcours US‑1 → US‑5 réalisable de bout en bout sur mobile, en light et dark.
+
+## Phase 3 — Auth admin (≈ 1,5 h)
+- [ ] Schéma `Admin`, seed au démarrage + script `seed:admin`.
+- [ ] `login` / `logout` / `me`, JWT cookie (`remember` → 7 j sinon 12 h), `JwtCookieGuard`, throttle 5/15 min.
+- [ ] Page `/admin/login` (`07-SCREENS.md §2`), `RequireAdmin`, redirections.
+- [ ] Tests e2e : mauvais mot de passe → 401 `INVALID_CREDENTIALS` ; bon → cookie + `me` 200 ; route admin sans cookie → 401 ; logout → `me` 401.
+- **Terminé quand** : impossible d'atteindre `/admin` sans être connecté ; ThemeToggle présent.
+
+## Phase 4 — Dashboard admin (≈ 4 h)
+- [ ] `GET /api/admin/stats` (agrégations `04 §5`, tranches vides complétées).
+- [ ] `GET /api/admin/tracks` (filtres, tris, rang global, liste des genres) + `PATCH /api/admin/tracks/:id`.
+- [ ] Page dashboard : bannière, période, KPI, artiste top, barre genres, histogramme, classement + filtres synchronisés à l'URL, actions optimistes, pagination, synchro auto.
+- [ ] Tests e2e : stats sur jeu de données connu (valeurs exactes) ; filtre `status=hidden` ; `sort=count_asc` ; regex spéciale `q=(` ne plante pas.
+- **Terminé quand** : US‑7 → US‑9 OK, light + dark, tablette 768 px lisible.
+
+## Phase 5 — Durcissement (≈ 1,5 h)
+- [ ] Revue a11y (navigation clavier complète, `aria-*`, contrastes) ; Lighthouse mobile ≥ 90 perf/a11y sur `/`.
+- [ ] Messages d'erreur FR partout ; page 404 ; Open Graph.
+- [ ] Logs propres, aucune donnée sensible loguée (mots de passe, IP en clair).
+- [ ] Scripts `recount` et `reset-data --yes`.
+
+## Phase 6 — Déploiement (≈ 1 h)
+- [ ] `Dockerfile` + config hébergeur, build prod servi par Nest, cache headers.
+- [ ] Checklist `08-DEPLOYMENT.md §4`.
+
+## Phase 7 — P1 (si temps)
+- [ ] US‑10 Export CSV
+- [ ] US‑11 Ouvrir/fermer les propositions (+ `GET /api/settings/public`)
+- [ ] US‑12 Mini‑lecteur mobile
+- [ ] US‑13 Raccourci ⌘K
+- [ ] US‑14 Playwright smoke (recherche → ajout → carte visible ; login → dashboard)
+
+---
+
+## Décisions prises en cours de route
+> Format : `AAAA-MM-JJ — décision — raison`. À compléter par l'agent.
+
+- 2026-11-25 — Debounce 1 s, min 3 caractères — prudence Deezer, cf. ADR D2.
+- 2026-11-25 — Pas d'ajout en texte libre — dédoublonnage impossible, cf. ADR D3.
+- 2026-11-25 — Identité morceau = ISRC (`trackKey`) — doublons constatés dans la réponse réelle `/search?q=bahi`, cf. ADR D8.
+- 2026-11-25 — 4 variables d'env seulement, cf. ADR D9.
+- 2026-11-25 — Versions figées : Nest 11, React 18, TS 5.9, ESLint 9, Vite 7, Vitest 3, Mongoose 8, Jest 29, zod 4 — stack imposée (Nest 11 / React 18) ; majors plus récents (Nest 12, TS 7, Vite 8) évités la veille de la prod.
+- 2026-11-25 — `packages/shared` buildé par `tsup` (ESM + CJS) : consommé en CJS par Nest et en ESM par Vite ; `ErrorCode` est un objet `as const` + type union (pas d'`enum`).
+- 2026-11-25 — Code d'erreur `NOT_FOUND` (404) ajouté pour les routes API inconnues ; 403 génériques mappés sur `UNAUTHORIZED` — le tableau `03 §1` ne couvrait pas ces cas.
+- 2026-11-25 — Script anti-flash du thème servi en fichier externe bloquant (`public/theme-init.js`) au lieu d'un script inline : même effet, et la CSP helmet reste `script-src 'self'`.
+- 2026-11-25 — Sans `MONGODB_URI` hors production, l'API démarre sur mongodb-memory-server (warning) ; en production `MONGODB_URI` est obligatoire (zod). `.env` local créé sans URI.
+- 2026-11-25 — pnpm 12 : builds autorisés via `allowBuilds` dans `pnpm-workspace.yaml` (esbuild, mongodb-memory-server, @nestjs/core).

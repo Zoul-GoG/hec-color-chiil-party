@@ -1,0 +1,7 @@
+dist
+coverage
+pnpm-lock.yaml
+design-references
+apps/api/test/fixtures
+docs
+*.md
