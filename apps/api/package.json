@@ -8,7 +8,9 @@
     "start": "node dist/main.js",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "jest --runInBand",
-    "seed:admin": "nest build && node dist/scripts/seed-admin.js"
+    "seed:admin": "nest build && node dist/scripts/seed-admin.js",
+    "recount": "nest build && node dist/scripts/run-maintenance.js recount",
+    "reset-data": "nest build && node dist/scripts/run-maintenance.js reset-data"
   },
   "dependencies": {
     "@hcc/shared": "workspace:*",

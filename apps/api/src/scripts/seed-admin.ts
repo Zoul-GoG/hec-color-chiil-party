@@ -8,6 +8,8 @@ async function main(): Promise<void> {
   const app = await NestFactory.createApplicationContext(AppModule, { logger: ['log', 'warn', 'error'] });
   await app.get(AdminSeedService).seed();
   await app.close();
+  // Exit explicitly: a local in-memory MongoDB child would otherwise keep the process alive.
+  process.exit(0);
 }
 
 main().catch((e: unknown) => {

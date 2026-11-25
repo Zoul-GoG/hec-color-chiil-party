@@ -57,10 +57,10 @@ Commit à la fin de chaque phase : `feat(phase-N): …`.
 - **Terminé quand** : US‑7 → US‑9 OK, light + dark, tablette 768 px lisible.
 
 ## Phase 5 — Durcissement (≈ 1,5 h)
-- [ ] Revue a11y (navigation clavier complète, `aria-*`, contrastes) ; Lighthouse mobile ≥ 90 perf/a11y sur `/`.
-- [ ] Messages d'erreur FR partout ; page 404 ; Open Graph.
-- [ ] Logs propres, aucune donnée sensible loguée (mots de passe, IP en clair).
-- [ ] Scripts `recount` et `reset-data --yes`.
+- [x] Revue a11y (navigation clavier complète, `aria-*`, contrastes) ; Lighthouse mobile ≥ 90 perf/a11y sur `/`.
+- [x] Messages d'erreur FR partout ; page 404 ; Open Graph.
+- [x] Logs propres, aucune donnée sensible loguée (mots de passe, IP en clair).
+- [x] Scripts `recount` et `reset-data --yes`.
 
 ## Phase 6 — Déploiement (≈ 1 h)
 - [ ] `Dockerfile` + config hébergeur, build prod servi par Nest, cache headers.
@@ -109,3 +109,6 @@ Commit à la fin de chaque phase : `feat(phase-N): …`.
 - 2026-11-25 — Classement admin : genre `null` filtré et affiché comme « Autres » ; « Plus récents » = `firstAddedAt` desc (même sens que l'onglet public) ; tri A→Z avec collation `fr`. Un morceau masqué garde le rang qu'aurait son compteur.
 - 2026-11-25 — La période (bannière) et le filtre `range` du classement partagent le même paramètre d'URL `range`. L'état « Synchro auto » est mémorisé en localStorage (`hcc-auto-sync`).
 - 2026-11-25 — Variation « Dernière heure » : badge vert pâle (`party-green/15`, texte `fg` + icône verte) car le vert de fête n'atteint pas AA en texte sur fond clair.
+- 2026-11-25 — Lighthouse mobile sur `/` (build prod servi par Nest, Chromium Playwright) : perf 97 · a11y 100 · bonnes pratiques 100 · SEO 100 ; LCP 2,4 s, CLS 0. Gain principal : polices **auto-hébergées** (`public/fonts`, woff2 latin/latin-ext, préchargées, cache immutable) au lieu de Google Fonts bloquant — la CSP n'autorise plus aucune origine de police tierce. `robots.txt` ajouté (`Disallow: /admin`).
+- 2026-11-25 — Logs : niveau `debug` (une ligne par appel Deezer) désactivé en production ; aucun mot de passe, IP ou guestId n'est logué (revue des appels `Logger`).
+- 2026-11-25 — Scripts `recount` / `reset-data --yes` / `seed:admin` : `nest build` puis exécution de `dist/scripts/*` ; sortie explicite (`process.exit`) pour ne pas rester bloqué sur le mongod en mémoire en local. `reset-data` sans `--yes` refuse.

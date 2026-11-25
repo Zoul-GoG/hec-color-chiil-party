@@ -3,10 +3,12 @@ import { NestFactory } from '@nestjs/core';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { AppModule } from './app.module';
 import { configureApp } from './configure-app';
-import { PORT } from './config/constants';
+import { IS_PRODUCTION, PORT } from './config/constants';
 
 async function bootstrap(): Promise<void> {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+    logger: IS_PRODUCTION ? ['log', 'warn', 'error'] : ['log', 'warn', 'error', 'debug'],
+  });
   configureApp(app);
   app.enableShutdownHooks();
   await app.listen(PORT);

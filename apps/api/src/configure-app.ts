@@ -24,8 +24,8 @@ export function configureApp(app: NestExpressApplication): void {
         directives: {
           defaultSrc: ["'self'"],
           scriptSrc: ["'self'"],
-          styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
-          fontSrc: ["'self'", 'https://fonts.gstatic.com'],
+          styleSrc: ["'self'", "'unsafe-inline'"],
+          fontSrc: ["'self'"],
           imgSrc: ["'self'", 'data:', 'https://*.dzcdn.net'],
           mediaSrc: ["'self'", 'data:', 'https://*.dzcdn.net'],
           connectSrc: ["'self'"],
@@ -48,6 +48,9 @@ export function configureApp(app: NestExpressApplication): void {
   serveWeb(app);
 }
 
+// Content-hashed files: Vite assets and self-hosted fonts.
+const IMMUTABLE_DIRS = [join('dist', 'assets'), join('dist', 'fonts')];
+
 /** Serves the SPA (same origin as the API): hashed assets immutable, index.html no-cache. */
 function serveWeb(app: NestExpressApplication): void {
   if (!existsSync(join(WEB_DIST, 'index.html'))) return;
@@ -58,7 +61,9 @@ function serveWeb(app: NestExpressApplication): void {
       setHeaders: (res, path) => {
         res.setHeader(
           'Cache-Control',
-          path.includes(`${join('dist', 'assets')}`) ? 'public, max-age=31536000, immutable' : 'no-cache',
+          IMMUTABLE_DIRS.some((dir) => path.includes(dir))
+            ? 'public, max-age=31536000, immutable'
+            : 'no-cache',
         );
       },
     }),
