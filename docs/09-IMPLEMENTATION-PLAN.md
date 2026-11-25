@@ -43,10 +43,10 @@ Commit à la fin de chaque phase : `feat(phase-N): …`.
 - **Terminé quand** : parcours US‑1 → US‑5 réalisable de bout en bout sur mobile, en light et dark.
 
 ## Phase 3 — Auth admin (≈ 1,5 h)
-- [ ] Schéma `Admin`, seed au démarrage + script `seed:admin`.
-- [ ] `login` / `logout` / `me`, JWT cookie (`remember` → 7 j sinon 12 h), `JwtCookieGuard`, throttle 5/15 min.
-- [ ] Page `/admin/login` (`07-SCREENS.md §2`), `RequireAdmin`, redirections.
-- [ ] Tests e2e : mauvais mot de passe → 401 `INVALID_CREDENTIALS` ; bon → cookie + `me` 200 ; route admin sans cookie → 401 ; logout → `me` 401.
+- [x] Schéma `Admin`, seed au démarrage + script `seed:admin`.
+- [x] `login` / `logout` / `me`, JWT cookie (`remember` → 7 j sinon 12 h), `JwtCookieGuard`, throttle 5/15 min.
+- [x] Page `/admin/login` (`07-SCREENS.md §2`), `RequireAdmin`, redirections.
+- [x] Tests e2e : mauvais mot de passe → 401 `INVALID_CREDENTIALS` ; bon → cookie + `me` 200 ; route admin sans cookie → 401 ; logout → `me` 401.
 - **Terminé quand** : impossible d'atteindre `/admin` sans être connecté ; ThemeToggle présent.
 
 ## Phase 4 — Dashboard admin (≈ 4 h)
@@ -100,3 +100,6 @@ Commit à la fin de chaque phase : `feat(phase-N): …`.
 - 2026-11-25 — Highlight après ajout : anneau rouge 2 s ; défilement doux seulement si la carte est déjà partiellement à l'écran (pas de saut de page pendant que le focus revient dans l'input).
 - 2026-11-25 — Vitest sous Node ≥ 22 : `--no-experimental-webstorage` dans les workers (le `localStorage` natif de Node masque celui de jsdom).
 - 2026-11-25 — Vérif visuelle : captures Playwright (Chromium headless) light/dark × 375/1280 + parcours réel (recherche → extrait → ajout → toast → highlight) sans erreur console.
+- 2026-11-25 — Limite de connexion : compteur maison des **échecs** par IP hachée (LRU, 5 / 15 min, fenêtre ancrée sur le 1er échec) plutôt que `@nestjs/throttler`, qui compterait aussi les connexions réussies. Au-delà : 429 même avec le bon mot de passe.
+- 2026-11-25 — Seed admin : un seul compte ; si `ADMIN_EMAIL` change, l'ancien compte est supprimé. Email inconnu → comparaison bcrypt sur un hash factice (pas de fuite par le timing). Le JWT n'est accepté que si l'admin existe encore.
+- 2026-11-25 — `seed:admin` = `nest build && node dist/scripts/seed-admin.js` (pas de ts-node) ; le seed tourne aussi à chaque démarrage.

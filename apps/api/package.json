@@ -7,7 +7,8 @@
     "dev": "nest start --watch",
     "start": "node dist/main.js",
     "typecheck": "tsc --noEmit -p tsconfig.json",
-    "test": "jest --runInBand"
+    "test": "jest --runInBand",
+    "seed:admin": "nest build && node dist/scripts/seed-admin.js"
   },
   "dependencies": {
     "@hcc/shared": "workspace:*",

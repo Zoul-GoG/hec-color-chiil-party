@@ -5,7 +5,8 @@ import { THROTTLE } from '../config/constants';
 import { readGuestId } from './guest-id.decorator';
 
 /** Named route-specific limits (docs/02-ARCHITECTURE.md §6). `global` applies everywhere. */
-export type RateLimitName = 'search' | 'addGuest' | 'addIp' | 'login';
+/** Login failures are counted separately (LoginAttemptsService): only FAILED attempts count. */
+export type RateLimitName = 'search' | 'addGuest' | 'addIp';
 
 const RATE_LIMIT_KEY = 'hcc:rate-limits';
 
@@ -49,13 +50,6 @@ export const throttlerOptions: ThrottlerModuleOptions = {
       limit: THROTTLE.additionsPerIp.limit,
       getTracker: byIp,
       skipIf: onlyFor('addIp'),
-    },
-    {
-      name: 'login',
-      ttl: THROTTLE.loginPerIp.ttlMs,
-      limit: THROTTLE.loginPerIp.limit,
-      getTracker: byIp,
-      skipIf: onlyFor('login'),
     },
   ],
 };

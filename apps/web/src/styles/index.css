@@ -49,9 +49,13 @@
   background-image: linear-gradient(120deg, #0652dd, #e02424);
 }
 
-/* Login page background (light) (docs/07 §2). */
+/* Login page background: blue gradient in light, plain `bg` + halos in dark (docs/07 §2). */
 .bg-gradient-login {
   background-image: linear-gradient(160deg, #0652dd, #0544b8);
+}
+.dark .bg-gradient-login {
+  background-image: none;
+  background-color: var(--bg);
 }
 
 /* Fallback cover when Deezer images fail. */

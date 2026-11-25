@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { AdditionsModule } from './additions/additions.module';
+import { AuthModule } from './admin/auth/auth.module';
 import { throttlerOptions } from './common/rate-limit';
 import { validateEnv } from './config/env';
 import { DatabaseModule } from './database/database.module';
@@ -27,6 +28,7 @@ import { TracksModule } from './tracks/tracks.module';
     HealthModule,
     TracksModule,
     AdditionsModule,
+    AuthModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })

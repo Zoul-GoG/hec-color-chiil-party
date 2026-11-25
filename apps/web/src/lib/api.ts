@@ -1,5 +1,7 @@
 import {
   ErrorCode,
+  type AdminLoginDto,
+  type AdminMeDto,
   type AddTrackResponseDto,
   type Paginated,
   type PreviewDto,
@@ -52,6 +54,13 @@ const qs = (params: Record<string, string | number | undefined>) => {
   for (const [k, v] of Object.entries(params)) if (v !== undefined && v !== '') s.set(k, String(v));
   const out = s.toString();
   return out ? `?${out}` : '';
+};
+
+export const adminApi = {
+  login: (body: AdminLoginDto) =>
+    request<AdminMeDto>('/admin/auth/login', { method: 'POST', body: JSON.stringify(body) }),
+  logout: () => request<void>('/admin/auth/logout', { method: 'POST' }),
+  me: () => request<AdminMeDto>('/admin/auth/me'),
 };
 
 export const api = {
