@@ -16,6 +16,9 @@ export const WEB_DIST = join(__dirname, '..', '..', 'web', 'dist');
 
 /** Shared by main.ts and the e2e tests so both run the exact same pipeline. */
 export function configureApp(app: NestExpressApplication): void {
+  // HSTS and upgrade-insecure-requests only make sense over HTTPS (production). On http://localhost,
+  // Safari honours them and upgrades every request to https, which breaks local testing.
+  const isProd = process.env.NODE_ENV === 'production';
   app.set('trust proxy', 1);
   app.disable('x-powered-by');
   app.use(
@@ -29,8 +32,10 @@ export function configureApp(app: NestExpressApplication): void {
           imgSrc: ["'self'", 'data:', 'https://*.dzcdn.net'],
           mediaSrc: ["'self'", 'data:', 'https://*.dzcdn.net'],
           connectSrc: ["'self'"],
+          upgradeInsecureRequests: isProd ? [] : null,
         },
       },
+      strictTransportSecurity: isProd,
       crossOriginEmbedderPolicy: false,
     }),
   );

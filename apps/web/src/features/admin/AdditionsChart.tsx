@@ -91,23 +91,26 @@ export function AdditionsChart({ stats, loading }: { stats?: StatsDto; loading: 
               ))}
             </div>
           </div>
-          <table className="sr-only">
-            <caption>{fr.dashboard.chartTableCaption}</caption>
-            <thead>
-              <tr>
-                <th>{fr.dashboard.chartColTime}</th>
-                <th>{fr.dashboard.chartColCount}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.map((d) => (
-                <tr key={d.bucketStart}>
-                  <td>{formatTime(d.bucketStart)}</td>
-                  <td>{d.count}</td>
+          {/* sr-only on a wrapper: Firefox renders a <caption> outside a clipped <table>. */}
+          <div className="sr-only">
+            <table>
+              <caption>{fr.dashboard.chartTableCaption}</caption>
+              <thead>
+                <tr>
+                  <th>{fr.dashboard.chartColTime}</th>
+                  <th>{fr.dashboard.chartColCount}</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {data.map((d) => (
+                  <tr key={d.bucketStart}>
+                    <td>{formatTime(d.bucketStart)}</td>
+                    <td>{d.count}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </>
       )}
     </Card>
