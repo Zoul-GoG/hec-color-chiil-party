@@ -43,7 +43,7 @@
 - **US-4 Playlist des invités** (sous la recherche) : liste de **tous** les morceaux ajoutés, avec pour chacun pochette, titre, artiste, durée et **compteur** « ×N » (nombre d'invités distincts qui l'ont ajouté).
   - Onglets : **« Les plus ajoutés »** (défaut, tri `addCount` desc puis `lastAddedAt` desc) et **« Récemment ajoutés »** (tri `firstAddedAt` desc).
   - Bouton ▶ extrait et bouton **« +1 »** (« Moi aussi ») qui revient à ajouter le morceau (même logique que US-3, sans vider l'input).
-  - Pagination « Charger plus » par 24.
+  - Pagination par 24 en scroll infini (chargement automatique en fin de liste).
   - Rafraîchissement automatique toutes les **15 s** (polling) + immédiat après un ajout.
   - Les morceaux **masqués** par l'admin n'apparaissent pas.
 - **US-5 Thème** : bouton clair/sombre dans l'en-tête de **chaque page**. Défaut = préférence système ; choix mémorisé (localStorage).

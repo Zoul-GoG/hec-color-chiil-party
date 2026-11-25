@@ -197,6 +197,75 @@ describe('Playlist (US-4)', () => {
     fireEvent.click(await screen.findByRole('tab', { name: '✨ Récemment ajoutés' }));
     await waitFor(() => expect(api.tracks).toHaveBeenCalledWith('recent', 1, 24));
   });
+  describe('infinite scroll', () => {
+    let observers: { cb: IntersectionObserverCallback; el?: Element }[] = [];
+    const reachBottom = () =>
+      act(() => {
+        for (const o of observers)
+          o.cb(
+            [{ isIntersecting: true, target: o.el } as IntersectionObserverEntry],
+            {} as IntersectionObserver,
+          );
+      });
+
+    beforeEach(() => {
+      observers = [];
+      vi.stubGlobal(
+        'IntersectionObserver',
+        class {
+          private entry: { cb: IntersectionObserverCallback; el?: Element };
+          constructor(cb: IntersectionObserverCallback) {
+            this.entry = { cb };
+            observers.push(this.entry);
+          }
+          observe(el: Element) {
+            this.entry.el = el;
+          }
+          disconnect() {
+            observers = observers.filter((o) => o !== this.entry);
+          }
+        },
+      );
+    });
+    afterEach(() => vi.unstubAllGlobals());
+
+    const pageOf = (n: number, hasMore: boolean) => ({
+      items: [track({ trackKey: `dz:${n}`, deezerId: n, title: `Son ${n}` })],
+      total: 2,
+      page: n,
+      limit: 24,
+      hasMore,
+    });
+
+    it('loads the next page when the end of the list is reached, without a button', async () => {
+      vi.mocked(api.tracks).mockImplementation((_sort, p) => Promise.resolve(pageOf(p ?? 1, p === 1)));
+      renderApp(<GuestPage />);
+      await screen.findByRole('article', { name: 'Son 1 — Niska' });
+      expect(screen.queryByRole('button', { name: 'Charger plus' })).not.toBeInTheDocument();
+      expect(api.tracks).not.toHaveBeenCalledWith('popular', 2, 24);
+
+      reachBottom();
+      await waitFor(() => expect(api.tracks).toHaveBeenCalledWith('popular', 2, 24));
+      expect(await screen.findByRole('article', { name: 'Son 2 — Niska' })).toBeInTheDocument();
+      expect(await screen.findByText(fr.playlist.end)).toBeInTheDocument();
+      // Last page reached: no more observer.
+      expect(observers).toHaveLength(0);
+    });
+
+    it('a failed page shows "Réessayer" and stops auto-loading', async () => {
+      vi.mocked(api.tracks).mockImplementation((_sort, p) =>
+        p === 1 ? Promise.resolve(pageOf(1, true)) : Promise.reject(new Error('boom')),
+      );
+      renderApp(<GuestPage />);
+      await screen.findByRole('article', { name: 'Son 1 — Niska' });
+      reachBottom();
+      const retry = await screen.findByRole('button', { name: 'Réessayer' });
+      expect(observers).toHaveLength(0);
+      vi.mocked(api.tracks).mockImplementation((_sort, p) => Promise.resolve(pageOf(p ?? 1, false)));
+      fireEvent.click(retry);
+      expect(await screen.findByRole('article', { name: 'Son 2 — Niska' })).toBeInTheDocument();
+    });
+  });
 });
 
 describe('P1', () => {

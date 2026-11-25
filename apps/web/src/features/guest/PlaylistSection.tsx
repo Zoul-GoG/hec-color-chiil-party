@@ -1,8 +1,9 @@
 import type { PublicSort, TrackDto } from '@hcc/shared';
-import { AlertTriangle, Disc3 } from 'lucide-react';
+import { AlertTriangle, Disc3, Loader2 } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '../../components/ui/Button';
 import { cn } from '../../components/ui/cn';
+import { supportsIntersectionObserver, useInfiniteScroll } from '../../hooks/useInfiniteScroll';
 import { useTracks } from '../../hooks/useTracks';
 import { fr } from '../../i18n/fr';
 import { TrackCard, TrackCardSkeleton } from './TrackCard';
@@ -20,7 +21,7 @@ const TABS: { id: PublicSort; label: string }[] = [
   { id: 'recent', label: fr.playlist.recent },
 ];
 
-/** US-4: guests' playlist with tabs, polling and "load more". */
+/** US-4: guests' playlist with tabs, polling and infinite scroll (24 per page). */
 export function PlaylistSection({
   highlightKey,
   onPlusOne,
@@ -32,6 +33,12 @@ export function PlaylistSection({
   const q = useTracks(sort);
   const tracks = q.data?.pages.flatMap((p) => p.items) ?? [];
   const total = q.data?.pages[0]?.total;
+  // A failed page stops auto-loading until the guest taps "Réessayer" (no retry loop).
+  const pageError = q.isFetchNextPageError;
+  const sentinelRef = useInfiniteScroll<HTMLDivElement>(
+    Boolean(q.hasNextPage) && !q.isFetchingNextPage && !pageError,
+    () => void q.fetchNextPage(),
+  );
 
   return (
     <section aria-labelledby="playlist-title" className="mt-14">
@@ -105,14 +112,21 @@ export function PlaylistSection({
                 />
               ))}
             </div>
-            <div className="mt-6 flex justify-center">
-              {q.hasNextPage ? (
-                <Button loading={q.isFetchingNextPage} onClick={() => void q.fetchNextPage()}>
-                  {fr.playlist.loadMore}
-                </Button>
-              ) : (
+            <div ref={sentinelRef} className="mt-6 flex min-h-10 justify-center" aria-live="polite">
+              {!q.hasNextPage ? (
                 <p className="text-sm text-fg-subtle">{fr.playlist.end}</p>
-              )}
+              ) : q.isFetchingNextPage ? (
+                <span className="inline-flex items-center gap-2 text-sm text-fg-muted">
+                  <Loader2 className="size-4 animate-spin" aria-hidden />
+                  {fr.playlist.loadingMore}
+                </span>
+              ) : pageError ? (
+                <Button size="sm" onClick={() => void q.fetchNextPage()}>
+                  {fr.playlist.retry}
+                </Button>
+              ) : !supportsIntersectionObserver() ? (
+                <Button onClick={() => void q.fetchNextPage()}>{fr.playlist.loadMore}</Button>
+              ) : null}
             </div>
           </>
         )}
