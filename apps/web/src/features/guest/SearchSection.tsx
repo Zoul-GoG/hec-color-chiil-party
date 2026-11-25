@@ -64,7 +64,6 @@ export const SearchSection = forwardRef<SearchSectionHandle, Props>(function Sea
           ))}
         </div>
       ) : null}
-      <p className="mt-2 text-center text-xs text-fg-subtle">{fr.search.limitHint}</p>
       {active ? (
         <SuggestionList
           query={term.trim()}

@@ -34,7 +34,6 @@ export const DEEZER = {
 export const THROTTLE = {
   globalPerMinute: 600,
   searchPerMinute: 40,
-  additionsPerGuest: { limit: 20, ttlMs: 10 * 60_000 },
   additionsPerIp: { limit: 300, ttlMs: 10 * 60_000 },
   loginPerIp: { limit: 5, ttlMs: 15 * 60_000 },
 } as const;

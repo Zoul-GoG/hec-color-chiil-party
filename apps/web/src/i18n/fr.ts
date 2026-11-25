@@ -34,7 +34,6 @@ export const fr = {
     clear: 'Effacer la recherche',
     ideas: 'Idées :',
     ideaChips: ['Coupé-Décalé', 'Afrobeats', 'Amapiano', 'Rap Ivoire', 'Zouglou', 'Afro House'],
-    limitHint: "Tu peux ajouter jusqu'à 20 sons.",
     resultsHeader: 'RÉSULTATS DEEZER',
     resultsCount: (n: number) => `${n} ${plural(n, 'résultat', 'résultats')}`,
     empty: (q: string) => `Aucun résultat pour « ${q} ». Essaie avec l'artiste ou une autre orthographe.`,

@@ -74,7 +74,7 @@ Pourquoi un seul service : pas de CORS, cookie httpOnly trivial, un seul déploi
 ## 3. Flux clés
 
 ### 3.1 Recherche
-1. `SearchBox` : valeur → `useDebouncedValue(1000 ms)` → si `q.trim().length >= 3` → `GET /api/search?q=…` avec `X-Guest-Id`, annulable.
+1. `SearchBox` : valeur → `useDebouncedValue(600 ms)` → si `q.trim().length >= 3` → `GET /api/search?q=…` avec `X-Guest-Id`, annulable.
 2. Back : normalise `q` (trim, minuscules, espaces multiples → 1) → cache LRU (TTL 5 min) → sinon Deezer `/search?q=…&limit=15` via le limiteur → dédoublonnage par `trackKey` → 8 premiers.
 3. Back enrichit chaque résultat avec `addCount` et `addedByMe` (1 requête `tracks.find({trackKey: {$in}})` + 1 `additions.find({guestId, trackKey: {$in}})`), filtre les morceaux masqués.
 
@@ -112,7 +112,7 @@ Pourquoi un seul service : pas de CORS, cookie httpOnly trivial, un seul déploi
 | # | Décision | Raison |
 |---|---|---|
 | D1 | Deezer appelé côté back uniquement | L'API Deezer n'envoie pas d'en-têtes CORS ; quotas à protéger par un cache commun |
-| D2 | Debounce 1 s, min 3 caractères | Compromis réactivité / prudence vis‑à‑vis de Deezer (limites inconnues). Constante `SEARCH_DEBOUNCE_MS` dans `apps/web/src/config.ts` |
+| D2 | Debounce 600 ms, min 3 caractères | Compromis réactivité / prudence vis‑à‑vis de Deezer (limites inconnues). Constante `SEARCH_DEBOUNCE_MS` dans `apps/web/src/config.ts` |
 | D3 | Pas de bouton « ajout en texte libre » (présent dans la maquette) | Sans morceau Deezer (ISRC), impossible de dédoublonner et de compter |
 | D8 | Identité = `trackKey` (ISRC) | La réponse réelle de `/search` contient le même titre sous plusieurs ids |
 | D9 | 4 variables d'env seulement | Mise en ligne rapide ; le reste en constantes |
@@ -130,7 +130,6 @@ Pourquoi un seul service : pas de CORS, cookie httpOnly trivial, un seul déploi
 | Route | Clé | Limite |
 |---|---|---|
 | `GET /api/search` | guestId (sinon IP) | 40 / min |
-| `POST /api/additions` | guestId | 20 / 10 min |
 | `POST /api/additions` | IP | 300 / 10 min (IP partagée du campus !) |
 | `POST /api/admin/auth/login` | IP | 5 / 15 min |
 | Global | IP | 600 / min |

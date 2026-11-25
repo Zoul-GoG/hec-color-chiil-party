@@ -6,11 +6,11 @@ import { readGuestId } from './guest-id.decorator';
 
 /** Named route-specific limits (docs/02-ARCHITECTURE.md §6). `global` applies everywhere. */
 /** Login failures are counted separately (LoginAttemptsService): only FAILED attempts count. */
-export type RateLimitName = 'search' | 'addGuest' | 'addIp';
+export type RateLimitName = 'search' | 'addIp';
 
 const RATE_LIMIT_KEY = 'hcc:rate-limits';
 
-/** Opts a handler into named throttlers: `@RateLimit('addGuest', 'addIp')`. */
+/** Opts a handler into named throttlers: `@RateLimit('search')`. */
 export const RateLimit = (...names: RateLimitName[]) => SetMetadata(RATE_LIMIT_KEY, names);
 
 const onlyFor =
@@ -36,13 +36,6 @@ export const throttlerOptions: ThrottlerModuleOptions = {
       limit: THROTTLE.searchPerMinute,
       getTracker: byGuestOrIp,
       skipIf: onlyFor('search'),
-    },
-    {
-      name: 'addGuest',
-      ttl: THROTTLE.additionsPerGuest.ttlMs,
-      limit: THROTTLE.additionsPerGuest.limit,
-      getTracker: byGuestOrIp,
-      skipIf: onlyFor('addGuest'),
     },
     {
       name: 'addIp',

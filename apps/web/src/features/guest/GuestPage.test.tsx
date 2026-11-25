@@ -1,5 +1,6 @@
 import { act, fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { SEARCH_DEBOUNCE_MS } from '../../config';
 import { api } from '../../lib/api';
 import { added, page, result, track } from '../../test/factories';
 import { renderApp } from '../../test/render';
@@ -31,11 +32,11 @@ describe('Search debounce (US-1)', () => {
     });
   };
 
-  it('does not call the API before 1000 ms', async () => {
+  it('does not call the API before the debounce delay (600 ms)', async () => {
     const search = vi.spyOn(api, 'search').mockResolvedValue({ items: [] });
     renderApp(<GuestPage />);
     type('bahi');
-    await flush(999);
+    await flush(SEARCH_DEBOUNCE_MS - 1);
     expect(search).not.toHaveBeenCalled();
     await flush(1);
     expect(search).toHaveBeenCalledTimes(1);
@@ -58,7 +59,7 @@ describe('Search debounce (US-1)', () => {
       type(v);
       await flush(150);
     }
-    await flush(1000);
+    await flush(SEARCH_DEBOUNCE_MS);
     expect(search).toHaveBeenCalledTimes(1);
     expect(search).toHaveBeenCalledWith('didi b', expect.any(AbortSignal));
   });

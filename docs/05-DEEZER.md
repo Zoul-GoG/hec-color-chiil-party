@@ -73,7 +73,7 @@ On ne connaît pas les limites exactes (la doc historique parle de 50 requêtes 
 
 | Défense | Valeur |
 |---|---|
-| Debounce côté front | **1000 ms**, recherche à partir de **3 caractères** |
+| Debounce côté front | **600 ms**, recherche à partir de **3 caractères** |
 | Cache front (TanStack Query) | `staleTime` 5 min par requête |
 | Cache back des recherches (`lru-cache`) | clé = `q` normalisée (trim, minuscules, sans accents, espaces simples) ; `max 2000`, **`ttl 5 min`** (les extraits restent valides ≥ 10 min) |
 | Dédoublonnage des requêtes en vol | `Map<key, Promise>` : 30 invités qui tapent « didi b » = 1 appel |

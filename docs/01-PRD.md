@@ -26,7 +26,7 @@
 ### P0 — indispensable pour vendredi
 
 **Invité — page d'accueil `/`**
-- **US-1 Recherche** : je tape un titre/artiste ; après une courte pause de frappe (debounce **1 s**), les résultats Deezer s'affichent **sous l'input**.
+- **US-1 Recherche** : je tape un titre/artiste ; après une courte pause de frappe (debounce **600 ms**), les résultats Deezer s'affichent **sous l'input**.
   - Requête lancée à partir de **3 caractères**. `Entrée` lance la recherche immédiatement.
   - Une recherche en cours est **annulée** si je retape (AbortController).
   - Jusqu'à **8 suggestions** : pochette, titre, artiste, durée, badge « E » si explicite.
@@ -91,7 +91,7 @@ Comptes invités, pseudo, commentaires, votes négatifs, lecture complète des m
 | R3 | Seul un morceau trouvé chez Deezer peut être ajouté (pas de saisie libre). |
 | R4 | Un morceau masqué : invisible côté public, ajout refusé (`TRACK_HIDDEN`), compteur conservé côté admin. |
 | R5 | Les explicites sont autorisés (badge « E ») ; l'admin peut les filtrer/masquer. |
-| R6 | Max **20 ajouts / invité / 10 min**. |
+| R6 | ~~Max 20 ajouts / invité / 10 min~~ — **retiré** (25/11) : pas de plafond par invité ; seule la limite large par IP (300 / 10 min) subsiste. |
 
 ## 7. Exigences non fonctionnelles
 - Performance : LCP < 2,5 s en 4G ; bundle JS initial < 250 kB gzip ; images pochettes en `loading="lazy"`.

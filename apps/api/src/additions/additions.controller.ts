@@ -11,7 +11,7 @@ export class AdditionsController {
   constructor(private readonly additions: AdditionsService) {}
 
   @Post()
-  @RateLimit('addGuest', 'addIp')
+  @RateLimit('addIp')
   async add(
     @GuestId() guestId: string,
     @Body() body: AddTrackBodyDto,
